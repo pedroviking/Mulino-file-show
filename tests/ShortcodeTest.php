@@ -16,11 +16,11 @@ class ShortcodeTest extends MFS_TestCase {
 
 		$html = mfs_render_breadcrumb( false, self::TAXONOMY );
 
-		$this->assertStringContainsString( 'mdl-breadcrumb', $html );
+		$this->assertStringContainsString( 'mfs-breadcrumb', $html );
 		$this->assertStringContainsString( 'Home', $html );
 		$this->assertStringContainsString( 'https://example.test/docs', $html );
 		// No current-folder marker should be printed when nothing is selected.
-		$this->assertStringNotContainsString( 'mdl-current', $html );
+		$this->assertStringNotContainsString( 'mfs-current', $html );
 	}
 
 	public function test_breadcrumb_lists_ancestors_from_root_down_to_current() {
@@ -58,7 +58,7 @@ class ShortcodeTest extends MFS_TestCase {
 		$this->assertNotFalse( $current_pos );
 		$this->assertTrue( $decade_pos < $year_pos, 'Decade should appear before year in the breadcrumb.' );
 		$this->assertTrue( $year_pos < $current_pos, 'Year should appear before the current folder.' );
-		$this->assertStringContainsString( 'mdl-current', $html );
+		$this->assertStringContainsString( 'mfs-current', $html );
 	}
 
 	// ---------------------------------------------------------------
@@ -96,7 +96,7 @@ class ShortcodeTest extends MFS_TestCase {
 		$this->assertStringContainsString( '2020s', $html );
 		$this->assertStringContainsString( 'mfs_folder=2010s', $html );
 		$this->assertStringContainsString( 'mfs_folder=2020s', $html );
-		$this->assertSame( 2, substr_count( $html, 'mdl-card--folder' ) );
+		$this->assertSame( 2, substr_count( $html, 'mfs-card--folder' ) );
 	}
 
 	// ---------------------------------------------------------------
@@ -204,7 +204,7 @@ class ShortcodeTest extends MFS_TestCase {
 
 		$this->assertStringContainsString( 'https://example.test/uploads/2023/09/minutes.pdf', $html );
 		$this->assertStringContainsString( 'Referat generalforsamling 2023', $html );
-		$this->assertStringContainsString( 'mdl-card--file', $html );
+		$this->assertStringContainsString( 'mfs-card--file', $html );
 	}
 
 	public function test_documents_without_an_attached_file_are_skipped() {
@@ -221,6 +221,6 @@ class ShortcodeTest extends MFS_TestCase {
 
 		$html = mfs_render_documents( $folder, self::TAXONOMY );
 
-		$this->assertStringNotContainsString( 'mdl-card--file', $html );
+		$this->assertStringNotContainsString( 'mfs-card--file', $html );
 	}
 }

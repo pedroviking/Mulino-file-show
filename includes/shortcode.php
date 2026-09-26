@@ -178,7 +178,7 @@ function mfs_render_documents( $current_term, $taxonomy ) {
  */
 function mfs_enqueue_frontend_styles() {
 	wp_enqueue_style(
-		'mdl-frontend',
+		'mfs-frontend',
 		MFS_URL . 'assets/css/frontend.css',
 		array(),
 		MFS_VERSION

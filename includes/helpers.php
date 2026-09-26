@@ -41,7 +41,7 @@ function mfs_get_file_type( $url ) {
 }
 
 function mfs_file_icon_svg( $label, $color ) {
-	return '<svg class="mdl-icon" viewBox="0 0 48 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+	return '<svg class="mfs-icon" viewBox="0 0 48 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 		<path d="M4 2h24l16 16v36a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4Z" fill="#ffffff" stroke="#cfd4d8" stroke-width="1.5"/>
 		<path d="M28 2v12a4 4 0 0 0 4 4h12Z" fill="#e9edf0" stroke="#cfd4d8" stroke-width="1.5"/>
 		<rect x="0" y="42" width="48" height="18" rx="3" fill="' . esc_attr( $color ) . '"/>

@@ -126,14 +126,14 @@ function mfs_admin_enqueue( $hook ) {
 		wp_enqueue_media();
 
 		wp_enqueue_script(
-			'mdl-media-picker',
+			'mfs-media-picker',
 			MFS_URL . 'assets/js/media-picker.js',
 			array( 'jquery', 'media-editor' ),
 			MFS_VERSION,
 			true
 		);
 		wp_localize_script(
-			'mdl-media-picker',
+			'mfs-media-picker',
 			'mfsMediaPicker',
 			array(
 				'title'      => __( 'Select or upload a document', 'mulino-file-show' ),

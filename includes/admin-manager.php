@@ -43,14 +43,14 @@ function mfs_enqueue_manager_assets( $hook ) {
 	}
 
 	wp_enqueue_style(
-		'mdl-manager',
+		'mfs-manager-assets',
 		MFS_URL . 'assets/css/admin-manager.css',
 		array(),
 		MFS_VERSION
 	);
 
 	wp_enqueue_script(
-		'mdl-manager',
+		'mfs-manager-assets',
 		MFS_URL . 'assets/js/admin-manager.js',
 		array(),
 		MFS_VERSION,
@@ -58,7 +58,7 @@ function mfs_enqueue_manager_assets( $hook ) {
 	);
 
 	wp_localize_script(
-		'mdl-manager',
+		'mfs-manager-assets',
 		'mfsManager',
 		array(
 			'nonce'   => wp_create_nonce( 'mfs_manager_nonce' ),

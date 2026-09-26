@@ -4,7 +4,7 @@ Tags: documents, files, folders, file manager, document library
 Requires at least: 5.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,9 @@ library. This may change in a future version.
 2. The public folder browser shown by the `[mfs_documents]` shortcode.
 
 == Changelog ==
+
+= 1.0.1 =
+* Internal cleanup: a few leftover asset handles and one icon CSS class from an earlier plugin name had never been fully renamed. They are harmless in isolation but were replaced for consistency and to remove any theoretical collision risk with another plugin.
 
 = 1.0.0 =
 * First release under the name Mulino file show: nested folders, drag-and-drop admin manager, rename/delete support for both folders and documents, frontend shortcode, and extension hooks for building add-ons.
