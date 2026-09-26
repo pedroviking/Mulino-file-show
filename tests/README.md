@@ -14,7 +14,7 @@ sudo apt update
 sudo apt install php-cli php-mbstring php-xml unzip
 sudo apt install composer   # or see https://getcomposer.org/download/ for the latest version
 
-# From inside the docsplorer/ plugin folder:
+# From inside the mulino-file-show/ plugin folder:
 composer install
 ```
 
@@ -57,10 +57,10 @@ Covered, with real unit tests:
 - `includes/helpers.php` -- the file-extension-to-badge mapping and the SVG
   icon builders.
 - `includes/shortcode.php` -- the breadcrumb, subfolder, and document
-  rendering functions, including regression tests for the two bugs (a 
-  folder's documents leaking into its parent folder, and the "No 
-  documents in this folder" message showing even when the folder had 
-  subfolders).
+  rendering functions, including regression tests for the two bugs we found
+  and fixed together (a folder's documents leaking into its parent folder,
+  and the "No documents in this folder" message showing even when the
+  folder had subfolders).
 
 Not covered yet:
 
@@ -68,8 +68,9 @@ Not covered yet:
   heavily on things like `$_FILES`, AJAX nonces, and WordPress's media
   upload pipeline, which need a fair bit more WP_Mock setup (or a full
   WordPress test environment) to test meaningfully. This is a reasonable
-  next step.
-  
+  next step once the current suite feels familiar -- ask if you'd like a
+  hand extending it in that direction.
+
 ## How this works, in a nutshell
 
 Each test:
@@ -78,7 +79,7 @@ Each test:
    WP_Mock what a WordPress function should return when the plugin calls
    it -- similar in spirit to `unittest.mock.patch()` in Python, or a
    Google Mock `EXPECT_CALL` in C++.
-2. Calls the real Docsplorer function directly (no WordPress running).
+2. Calls the real Mulino file show function directly (no WordPress running).
 3. Asserts on what that function returned.
 
 `tests/bootstrap.php` loads the plugin's `includes/*.php` files once,

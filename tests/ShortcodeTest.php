@@ -2,25 +2,25 @@
 
 require_once __DIR__ . '/TestCase.php';
 
-class ShortcodeTest extends Docsplorer_TestCase {
+class ShortcodeTest extends MFS_TestCase {
 
-	const TAXONOMY = 'docsplorer_folder';
+	const TAXONOMY = 'mfs_folder';
 
 	// ---------------------------------------------------------------
-	// docsplorer_render_breadcrumb()
+	// mfs_render_breadcrumb()
 	// ---------------------------------------------------------------
 
 	public function test_breadcrumb_at_root_only_shows_home_link() {
 		$this->mock_escaping_functions();
 		WP_Mock::userFunction( 'remove_query_arg' )->andReturn( 'https://example.test/docs' );
 
-		$html = docsplorer_render_breadcrumb( false, self::TAXONOMY );
+		$html = mfs_render_breadcrumb( false, self::TAXONOMY );
 
-		$this->assertStringContainsString( 'docsplorer-breadcrumb', $html );
+		$this->assertStringContainsString( 'mdl-breadcrumb', $html );
 		$this->assertStringContainsString( 'Home', $html );
 		$this->assertStringContainsString( 'https://example.test/docs', $html );
 		// No current-folder marker should be printed when nothing is selected.
-		$this->assertStringNotContainsString( 'docsplorer-current', $html );
+		$this->assertStringNotContainsString( 'mdl-current', $html );
 	}
 
 	public function test_breadcrumb_lists_ancestors_from_root_down_to_current() {
@@ -47,7 +47,7 @@ class ShortcodeTest extends Docsplorer_TestCase {
 				}
 			);
 
-		$html = docsplorer_render_breadcrumb( $q1, self::TAXONOMY );
+		$html = mfs_render_breadcrumb( $q1, self::TAXONOMY );
 
 		$decade_pos  = strpos( $html, '2020s' );
 		$year_pos    = strpos( $html, '2023' );
@@ -58,17 +58,17 @@ class ShortcodeTest extends Docsplorer_TestCase {
 		$this->assertNotFalse( $current_pos );
 		$this->assertTrue( $decade_pos < $year_pos, 'Decade should appear before year in the breadcrumb.' );
 		$this->assertTrue( $year_pos < $current_pos, 'Year should appear before the current folder.' );
-		$this->assertStringContainsString( 'docsplorer-current', $html );
+		$this->assertStringContainsString( 'mdl-current', $html );
 	}
 
 	// ---------------------------------------------------------------
-	// docsplorer_render_subfolders()
+	// mfs_render_subfolders()
 	// ---------------------------------------------------------------
 
 	public function test_subfolders_returns_empty_string_when_there_are_none() {
 		WP_Mock::userFunction( 'get_terms' )->andReturn( array() );
 
-		$html = docsplorer_render_subfolders( false, self::TAXONOMY );
+		$html = mfs_render_subfolders( false, self::TAXONOMY );
 
 		$this->assertSame( '', $html );
 	}
@@ -90,33 +90,33 @@ class ShortcodeTest extends Docsplorer_TestCase {
 				}
 			);
 
-		$html = docsplorer_render_subfolders( false, self::TAXONOMY );
+		$html = mfs_render_subfolders( false, self::TAXONOMY );
 
 		$this->assertStringContainsString( '2010s', $html );
 		$this->assertStringContainsString( '2020s', $html );
-		$this->assertStringContainsString( 'docsplorer_folder=2010s', $html );
-		$this->assertStringContainsString( 'docsplorer_folder=2020s', $html );
-		$this->assertSame( 2, substr_count( $html, 'docsplorer-card--folder' ) );
+		$this->assertStringContainsString( 'mfs_folder=2010s', $html );
+		$this->assertStringContainsString( 'mfs_folder=2020s', $html );
+		$this->assertSame( 2, substr_count( $html, 'mdl-card--folder' ) );
 	}
 
 	// ---------------------------------------------------------------
-	// docsplorer_folder_icon_svg()
+	// mfs_folder_icon_svg()
 	// ---------------------------------------------------------------
 
 	public function test_folder_icon_is_an_svg() {
-		$html = docsplorer_folder_icon_svg();
+		$html = mfs_folder_icon_svg();
 
 		$this->assertStringStartsWith( '<svg', trim( $html ) );
 	}
 
 	// ---------------------------------------------------------------
-	// docsplorer_render_documents()
+	// mfs_render_documents()
 	// ---------------------------------------------------------------
 
 	public function test_documents_returns_empty_string_at_root() {
 		// No current folder selected at all (the top-level "All" view)
 		// -- there's nothing to query yet.
-		$html = docsplorer_render_documents( false, self::TAXONOMY );
+		$html = mfs_render_documents( false, self::TAXONOMY );
 
 		$this->assertSame( '', $html );
 	}
@@ -129,7 +129,7 @@ class ShortcodeTest extends Docsplorer_TestCase {
 		WP_Mock::userFunction( 'get_posts' )->andReturn( array() );
 		WP_Mock::userFunction( 'wp_count_terms' )->andReturn( 0 );
 
-		$html = docsplorer_render_documents( $folder, self::TAXONOMY );
+		$html = mfs_render_documents( $folder, self::TAXONOMY );
 
 		$this->assertStringContainsString( 'No documents in this folder.', $html );
 	}
@@ -145,7 +145,7 @@ class ShortcodeTest extends Docsplorer_TestCase {
 		WP_Mock::userFunction( 'get_posts' )->andReturn( array() );
 		WP_Mock::userFunction( 'wp_count_terms' )->andReturn( 3 ); // e.g. 2021, 2022, 2023
 
-		$html = docsplorer_render_documents( $folder, self::TAXONOMY );
+		$html = mfs_render_documents( $folder, self::TAXONOMY );
 
 		$this->assertSame( '', $html );
 	}
@@ -171,7 +171,7 @@ class ShortcodeTest extends Docsplorer_TestCase {
 		WP_Mock::userFunction( 'wp_count_terms' )->andReturn( 0 );
 		$this->mock_escaping_functions();
 
-		docsplorer_render_documents( $folder, self::TAXONOMY );
+		mfs_render_documents( $folder, self::TAXONOMY );
 
 		$this->assertIsArray( $captured_args, 'get_posts() should have been called.' );
 		$this->assertFalse( $captured_args['tax_query'][0]['include_children'] );
@@ -185,7 +185,7 @@ class ShortcodeTest extends Docsplorer_TestCase {
 
 		WP_Mock::userFunction( 'get_posts' )->andReturn( array( $post ) );
 		WP_Mock::userFunction( 'get_post_meta' )
-			->with( 101, '_docsplorer_file_id', true )
+			->with( 101, '_mfs_file_id', true )
 			->andReturn( 42 );
 		WP_Mock::userFunction( 'wp_get_attachment_url' )
 			->with( 42 )
@@ -200,11 +200,11 @@ class ShortcodeTest extends Docsplorer_TestCase {
 			->with( $post )
 			->andReturn( 'Referat generalforsamling 2023' );
 
-		$html = docsplorer_render_documents( $folder, self::TAXONOMY );
+		$html = mfs_render_documents( $folder, self::TAXONOMY );
 
 		$this->assertStringContainsString( 'https://example.test/uploads/2023/09/minutes.pdf', $html );
 		$this->assertStringContainsString( 'Referat generalforsamling 2023', $html );
-		$this->assertStringContainsString( 'docsplorer-card--file', $html );
+		$this->assertStringContainsString( 'mdl-card--file', $html );
 	}
 
 	public function test_documents_without_an_attached_file_are_skipped() {
@@ -216,11 +216,11 @@ class ShortcodeTest extends Docsplorer_TestCase {
 		WP_Mock::userFunction( 'get_posts' )->andReturn( array( $post ) );
 		// No file was ever attached to this document post.
 		WP_Mock::userFunction( 'get_post_meta' )
-			->with( 102, '_docsplorer_file_id', true )
+			->with( 102, '_mfs_file_id', true )
 			->andReturn( 0 );
 
-		$html = docsplorer_render_documents( $folder, self::TAXONOMY );
+		$html = mfs_render_documents( $folder, self::TAXONOMY );
 
-		$this->assertStringNotContainsString( 'docsplorer-card--file', $html );
+		$this->assertStringNotContainsString( 'mdl-card--file', $html );
 	}
 }

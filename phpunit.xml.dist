@@ -3,7 +3,7 @@
          colors="true"
          beStrictAboutTestsThatDoNotTestAnything="true">
     <testsuites>
-        <testsuite name="Docsplorer">
+        <testsuite name="Mulino file show">
             <directory>tests</directory>
         </testsuite>
     </testsuites>

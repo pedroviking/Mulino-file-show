@@ -1,11 +1,11 @@
-# Docsplorer
+# Mulino file show
 
 A lightweight WordPress plugin for browsing documents (or any files) in
 nested folders — think decades and years, or any hierarchy you like —
 with drag-and-drop upload and organization in the admin, and a clean,
 breadcrumb-navigable folder browser on the public side of your site.
 
-[![Tests](https://github.com/pedroviking/docsplorer/actions/workflows/tests.yml/badge.svg)](https://github.com/pedroviking/docsplorer/actions/workflows/tests.yml)
+[![Tests](https://github.com/pedroviking/mulino-file-show/actions/workflows/tests.yml/badge.svg)](https://github.com/pedroviking/mulino-file-show/actions/workflows/tests.yml)
 
 ## Why
 
@@ -37,20 +37,20 @@ PHP versions.
 Not yet published on the WordPress.org plugin directory. Until then:
 
 1. Download this repository as a ZIP (Code → Download ZIP), or clone it.
-2. Upload the `docsplorer` folder to `wp-content/plugins/`.
-3. Activate **Docsplorer** under Plugins in your WordPress admin.
+2. Upload the `mulino-file-show` folder to `wp-content/plugins/`.
+3. Activate **Mulino file show** under Plugins in your WordPress admin.
 
 ## Usage
 
-- Manage folders and documents under **Docsplorer** in the admin menu.
+- Manage folders and documents under **Mulino file show** in the admin menu.
 - Drop a file onto the drop zone to upload it into the currently open
   folder; drag a file card or a folder in the tree to re-file it.
-- Add the `[docsplorer_documents]` shortcode to any page or post to
+- Add the `[mfs_documents]` shortcode to any page or post to
   show the public, browsable folder view.
 
 ## Extending
 
-Docsplorer fires a set of actions and filters intended for building a
+Mulino file show fires a set of actions and filters intended for building a
 separate add-on plugin on top of it (rather than modifying this plugin
 directly). See [`HOOKS.md`](HOOKS.md) for the full list.
 

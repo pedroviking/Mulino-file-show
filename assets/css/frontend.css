@@ -1,0 +1,46 @@
+.mfs-browser { max-width: 900px; }
+.mfs-breadcrumb {
+	margin-bottom: 1.25em;
+	font-size: 0.95em;
+	color: #555;
+}
+.mfs-breadcrumb a { color: #2271b1; text-decoration: none; }
+.mfs-breadcrumb a:hover { text-decoration: underline; }
+.mfs-breadcrumb .mfs-current { font-weight: 600; color: #23282d; }
+
+.mfs-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+	gap: 1.25em;
+	margin: 0 0 1.75em;
+}
+.mfs-card {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	padding: 1em 0.5em;
+	border-radius: 10px;
+	border: 1px solid #e5e5e5;
+	background: #fff;
+	text-decoration: none;
+	color: #333;
+	transition: box-shadow .15s ease, transform .15s ease, border-color .15s ease;
+}
+.mfs-card:hover {
+	box-shadow: 0 6px 16px rgba(0,0,0,.08);
+	transform: translateY(-2px);
+	border-color: #ccc;
+	color: #333;
+}
+.mfs-icon {
+	width: 56px;
+	height: 56px;
+	margin-bottom: 0.6em;
+}
+.mfs-name {
+	font-size: 0.85em;
+	line-height: 1.3;
+	word-break: break-word;
+}
+.mfs-empty { font-style: italic; color: #777; }
