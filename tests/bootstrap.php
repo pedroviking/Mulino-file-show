@@ -24,7 +24,7 @@ WP_Mock::bootstrap();
 // (their normal protection against being loaded outside WordPress).
 // We just need *some* value here so that guard doesn't trigger.
 if ( ! defined( 'ABSPATH' ) ) {
-	define( 'ABSPATH', '/tmp/mfs-tests/' );
+	define( 'ABSPATH', '/tmp/mulino-tests/' );
 }
 
 /**

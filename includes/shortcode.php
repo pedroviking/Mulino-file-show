@@ -1,6 +1,6 @@
 <?php
 /**
- * Frontend [mfs_documents] shortcode: breadcrumb, subfolder
+ * Frontend [mulino_documents] shortcode: breadcrumb, subfolder
  * grid, document grid, and the styling for the public-facing browser.
  */
 
@@ -10,44 +10,44 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * -----------------------------------------------------------------
- * 4. FRONTEND SHORTCODE: [mfs_documents]
+ * 4. FRONTEND SHORTCODE: [mulino_documents]
  * -----------------------------------------------------------------
  * Renders the current folder's subfolders + documents, with a
  * breadcrumb trail built from the taxonomy's own parent/child data.
  * No filesystem paths are ever read from user input, only a term
- * slug that is looked up against the mfs_folder taxonomy -- so
+ * slug that is looked up against the mulino_folder taxonomy -- so
  * there's no path-traversal surface here.
  */
-function mfs_shortcode() {
-	$taxonomy = 'mfs_folder';
+function mulino_shortcode() {
+	$taxonomy = 'mulino_folder';
 
 	// Sanitize + validate the requested folder slug. This is read-only
 	// display filtering (which folder to show), not a state-changing
 	// action, so nonce verification doesn't apply here the way it
 	// would for a form submission.
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	$requested_slug = isset( $_GET['mfs_folder'] ) ? sanitize_title( wp_unslash( $_GET['mfs_folder'] ) ) : '';
+	$requested_slug = isset( $_GET['mulino_folder'] ) ? sanitize_title( wp_unslash( $_GET['mulino_folder'] ) ) : '';
 	$current_term   = $requested_slug ? get_term_by( 'slug', $requested_slug, $taxonomy ) : false;
 
 	ob_start();
 	?>
-	<div class="mfs-browser">
+	<div class="mulino-browser">
 		<?php
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- each value is escaped individually inside this function before being concatenated into the returned HTML string.
-		echo mfs_render_breadcrumb( $current_term, $taxonomy );
+		echo mulino_render_breadcrumb( $current_term, $taxonomy );
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- each value is escaped individually inside this function before being concatenated into the returned HTML string.
-		echo mfs_render_subfolders( $current_term, $taxonomy );
+		echo mulino_render_subfolders( $current_term, $taxonomy );
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- each value is escaped individually inside this function before being concatenated into the returned HTML string.
-		echo mfs_render_documents( $current_term, $taxonomy );
+		echo mulino_render_documents( $current_term, $taxonomy );
 		?>
 	</div>
 	<?php
 	return ob_get_clean();
 }
-add_shortcode( 'mfs_documents', 'mfs_shortcode' );
+add_shortcode( 'mulino_documents', 'mulino_shortcode' );
 
-function mfs_render_breadcrumb( $current_term, $taxonomy ) {
-	$base_url = remove_query_arg( 'mfs_folder' );
+function mulino_render_breadcrumb( $current_term, $taxonomy ) {
+	$base_url = remove_query_arg( 'mulino_folder' );
 	$crumbs   = array( '<a href="' . esc_url( $base_url ) . '">' . esc_html__( 'Home', 'mulino-file-show' ) . '</a>' );
 
 	if ( $current_term && ! is_wp_error( $current_term ) ) {
@@ -55,17 +55,17 @@ function mfs_render_breadcrumb( $current_term, $taxonomy ) {
 		foreach ( $ancestors as $ancestor_id ) {
 			$ancestor = get_term( $ancestor_id, $taxonomy );
 			if ( $ancestor && ! is_wp_error( $ancestor ) ) {
-				$url      = add_query_arg( 'mfs_folder', $ancestor->slug, $base_url );
+				$url      = add_query_arg( 'mulino_folder', $ancestor->slug, $base_url );
 				$crumbs[] = '<a href="' . esc_url( $url ) . '">' . esc_html( $ancestor->name ) . '</a>';
 			}
 		}
-		$crumbs[] = '<span class="mfs-current">' . esc_html( $current_term->name ) . '</span>';
+		$crumbs[] = '<span class="mulino-current">' . esc_html( $current_term->name ) . '</span>';
 	}
 
-	return '<nav class="mfs-breadcrumb">' . implode( ' &raquo; ', $crumbs ) . '</nav>';
+	return '<nav class="mulino-breadcrumb">' . implode( ' &raquo; ', $crumbs ) . '</nav>';
 }
 
-function mfs_render_subfolders( $current_term, $taxonomy ) {
+function mulino_render_subfolders( $current_term, $taxonomy ) {
 	$parent_id = $current_term ? $current_term->term_id : 0;
 
 	$subfolders = get_terms(
@@ -80,13 +80,13 @@ function mfs_render_subfolders( $current_term, $taxonomy ) {
 		return '';
 	}
 
-	$base_url = remove_query_arg( 'mfs_folder' );
-	$out      = '<div class="mfs-grid">';
+	$base_url = remove_query_arg( 'mulino_folder' );
+	$out      = '<div class="mulino-grid">';
 	foreach ( $subfolders as $folder ) {
-		$url    = add_query_arg( 'mfs_folder', $folder->slug, $base_url );
-		$out   .= '<a class="mfs-card mfs-card--folder" href="' . esc_url( $url ) . '">'
-				. mfs_folder_icon_svg()
-				. '<span class="mfs-name">' . esc_html( $folder->name ) . '</span>'
+		$url    = add_query_arg( 'mulino_folder', $folder->slug, $base_url );
+		$out   .= '<a class="mulino-card mulino-card--folder" href="' . esc_url( $url ) . '">'
+				. mulino_folder_icon_svg()
+				. '<span class="mulino-name">' . esc_html( $folder->name ) . '</span>'
 				. '</a>';
 	}
 	$out .= '</div>';
@@ -94,14 +94,14 @@ function mfs_render_subfolders( $current_term, $taxonomy ) {
 	return $out;
 }
 
-function mfs_folder_icon_svg() {
-	return '<svg class="mfs-icon" viewBox="0 0 56 44" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+function mulino_folder_icon_svg() {
+	return '<svg class="mulino-icon" viewBox="0 0 56 44" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 		<path d="M2 7a4 4 0 0 1 4-4h13l4 5h27a4 4 0 0 1 4 4v27a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4Z" fill="#ffcf5c" stroke="#e0a52e" stroke-width="1.5"/>
 		<path d="M2 14h52v22a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4Z" fill="#ffe08a" stroke="#e0a52e" stroke-width="1.5"/>
 	</svg>';
 }
 
-function mfs_render_documents( $current_term, $taxonomy ) {
+function mulino_render_documents( $current_term, $taxonomy ) {
 	// At the root (no folder selected) we don't list documents that
 	// might be attached directly to top-level terms only -- adjust
 	// this if you want root-level "loose" documents too.
@@ -111,7 +111,7 @@ function mfs_render_documents( $current_term, $taxonomy ) {
 
 	$documents = get_posts(
 		array(
-			'post_type'      => 'mfs_document',
+			'post_type'      => 'mulino_document',
 			'posts_per_page' => -1,
 			'orderby'        => 'title',
 			'order'          => 'ASC',
@@ -144,12 +144,12 @@ function mfs_render_documents( $current_term, $taxonomy ) {
 		if ( ! is_wp_error( $subfolder_count ) && $subfolder_count > 0 ) {
 			return '';
 		}
-		return '<p class="mfs-empty">' . esc_html__( 'No documents in this folder.', 'mulino-file-show' ) . '</p>';
+		return '<p class="mulino-empty">' . esc_html__( 'No documents in this folder.', 'mulino-file-show' ) . '</p>';
 	}
 
-	$out = '<div class="mfs-grid">';
+	$out = '<div class="mulino-grid">';
 	foreach ( $documents as $doc ) {
-		$attachment_id = (int) get_post_meta( $doc->ID, '_mfs_file_id', true );
+		$attachment_id = (int) get_post_meta( $doc->ID, '_mulino_file_id', true );
 		if ( ! $attachment_id ) {
 			continue;
 		}
@@ -157,10 +157,10 @@ function mfs_render_documents( $current_term, $taxonomy ) {
 		if ( ! $url ) {
 			continue;
 		}
-		$icon = mfs_get_file_type( $url );
-		$out .= '<a class="mfs-card mfs-card--file" href="' . esc_url( $url ) . '" target="_blank" rel="noopener">'
-				. mfs_file_icon_svg( $icon['label'], $icon['color'] )
-				. '<span class="mfs-name">' . esc_html( get_the_title( $doc ) ) . '</span>'
+		$icon = mulino_get_file_type( $url );
+		$out .= '<a class="mulino-card mulino-card--file" href="' . esc_url( $url ) . '" target="_blank" rel="noopener">'
+				. mulino_file_icon_svg( $icon['label'], $icon['color'] )
+				. '<span class="mulino-name">' . esc_html( get_the_title( $doc ) ) . '</span>'
 				. '</a>';
 	}
 	$out .= '</div>';
@@ -176,12 +176,12 @@ function mfs_render_documents( $current_term, $taxonomy ) {
  * this is simpler and more reliable than trying to detect shortcode
  * usage before wp_enqueue_scripts runs (shortcodes render later).
  */
-function mfs_enqueue_frontend_styles() {
+function mulino_enqueue_frontend_styles() {
 	wp_enqueue_style(
-		'mfs-frontend',
-		MFS_URL . 'assets/css/frontend.css',
+		'mulino-frontend',
+		MULINO_URL . 'assets/css/frontend.css',
 		array(),
-		MFS_VERSION
+		MULINO_VERSION
 	);
 }
-add_action( 'wp_enqueue_scripts', 'mfs_enqueue_frontend_styles' );
+add_action( 'wp_enqueue_scripts', 'mulino_enqueue_frontend_styles' );

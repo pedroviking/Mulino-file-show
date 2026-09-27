@@ -19,49 +19,49 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Everything goes through admin-ajax.php with nonce + capability
  * checks, never trusting client-supplied folder/doc ownership.
  */
-function mfs_add_manager_page() {
+function mulino_add_manager_page() {
 	add_menu_page(
 		__( 'Mulino file show', 'mulino-file-show' ),
 		__( 'File Show', 'mulino-file-show' ),
 		'edit_posts',
-		'mfs-manager',
-		'mfs_render_manager_page',
+		'mulino-manager',
+		'mulino_render_manager_page',
 		'dashicons-media-document',
 		100
 	);
 }
-add_action( 'admin_menu', 'mfs_add_manager_page' );
+add_action( 'admin_menu', 'mulino_add_manager_page' );
 
 /**
  * Enqueue the Document Manager screen's stylesheet and drag-and-drop
  * script, but only on that one admin page -- add_menu_page() gives a
  * top-level page the hook suffix "toplevel_page_{menu_slug}".
  */
-function mfs_enqueue_manager_assets( $hook ) {
-	if ( 'toplevel_page_mfs-manager' !== $hook ) {
+function mulino_enqueue_manager_assets( $hook ) {
+	if ( 'toplevel_page_mulino-manager' !== $hook ) {
 		return;
 	}
 
 	wp_enqueue_style(
-		'mfs-manager-assets',
-		MFS_URL . 'assets/css/admin-manager.css',
+		'mulino-manager-assets',
+		MULINO_URL . 'assets/css/admin-manager.css',
 		array(),
-		MFS_VERSION
+		MULINO_VERSION
 	);
 
 	wp_enqueue_script(
-		'mfs-manager-assets',
-		MFS_URL . 'assets/js/admin-manager.js',
+		'mulino-manager-assets',
+		MULINO_URL . 'assets/js/admin-manager.js',
 		array(),
-		MFS_VERSION,
+		MULINO_VERSION,
 		true
 	);
 
 	wp_localize_script(
-		'mfs-manager-assets',
-		'mfsManager',
+		'mulino-manager-assets',
+		'mulinoManager',
 		array(
-			'nonce'   => wp_create_nonce( 'mfs_manager_nonce' ),
+			'nonce'   => wp_create_nonce( 'mulino_manager_nonce' ),
 			'rootUrl' => remove_query_arg( 'folder' ),
 			'i18n'    => array(
 				'uploadFailed'         => __( 'Upload failed.', 'mulino-file-show' ),
@@ -82,12 +82,12 @@ function mfs_enqueue_manager_assets( $hook ) {
 		)
 	);
 }
-add_action( 'admin_enqueue_scripts', 'mfs_enqueue_manager_assets' );
+add_action( 'admin_enqueue_scripts', 'mulino_enqueue_manager_assets' );
 
-function mfs_render_folder_tree( $parent_id, $selected_id ) {
+function mulino_render_folder_tree( $parent_id, $selected_id ) {
 	$terms = get_terms(
 		array(
-			'taxonomy'   => 'mfs_folder',
+			'taxonomy'   => 'mulino_folder',
 			'parent'     => $parent_id,
 			'hide_empty' => false,
 		)
@@ -98,17 +98,17 @@ function mfs_render_folder_tree( $parent_id, $selected_id ) {
 	}
 
 	$base_url = remove_query_arg( 'folder' );
-	$out      = '<ul class="mfs-subtree">';
+	$out      = '<ul class="mulino-subtree">';
 	foreach ( $terms as $term ) {
 		$url    = add_query_arg( 'folder', $term->slug, $base_url );
 		$is_sel = ( (int) $term->term_id === (int) $selected_id ) ? ' is-selected' : '';
-		$out   .= '<li class="mfs-tree-item' . esc_attr( $is_sel ) . '" data-term-id="' . esc_attr( $term->term_id ) . '">';
-		$out   .= '<span class="mfs-tree-row" draggable="true">';
-		$out   .= '<a href="' . esc_url( $url ) . '" class="mfs-tree-link" draggable="false" data-term-name="' . esc_attr( $term->name ) . '">' . esc_html( $term->name ) . '</a>';
-		$out   .= '<button type="button" class="mfs-tree-rename" data-term-id="' . esc_attr( $term->term_id ) . '" title="' . esc_attr__( 'Rename folder', 'mulino-file-show' ) . '">&#9998;</button>';
-		$out   .= '<button type="button" class="mfs-tree-delete" data-term-id="' . esc_attr( $term->term_id ) . '" title="' . esc_attr__( 'Delete folder', 'mulino-file-show' ) . '">&times;</button>';
+		$out   .= '<li class="mulino-tree-item' . esc_attr( $is_sel ) . '" data-term-id="' . esc_attr( $term->term_id ) . '">';
+		$out   .= '<span class="mulino-tree-row" draggable="true">';
+		$out   .= '<a href="' . esc_url( $url ) . '" class="mulino-tree-link" draggable="false" data-term-name="' . esc_attr( $term->name ) . '">' . esc_html( $term->name ) . '</a>';
+		$out   .= '<button type="button" class="mulino-tree-rename" data-term-id="' . esc_attr( $term->term_id ) . '" title="' . esc_attr__( 'Rename folder', 'mulino-file-show' ) . '">&#9998;</button>';
+		$out   .= '<button type="button" class="mulino-tree-delete" data-term-id="' . esc_attr( $term->term_id ) . '" title="' . esc_attr__( 'Delete folder', 'mulino-file-show' ) . '">&times;</button>';
 		$out   .= '</span>';
-		$out   .= mfs_render_folder_tree( $term->term_id, $selected_id );
+		$out   .= mulino_render_folder_tree( $term->term_id, $selected_id );
 		$out   .= '</li>';
 	}
 	$out .= '</ul>';
@@ -116,9 +116,9 @@ function mfs_render_folder_tree( $parent_id, $selected_id ) {
 	return $out;
 }
 
-function mfs_render_manager_cards( $term ) {
+function mulino_render_manager_cards( $term ) {
 	$args = array(
-		'post_type'      => 'mfs_document',
+		'post_type'      => 'mulino_document',
 		'posts_per_page' => -1,
 		'orderby'        => 'title',
 		'order'          => 'ASC',
@@ -131,7 +131,7 @@ function mfs_render_manager_cards( $term ) {
 		// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 		$args['tax_query'] = array(
 			array(
-				'taxonomy'         => 'mfs_folder',
+				'taxonomy'         => 'mulino_folder',
 				'field'            => 'term_id',
 				'terms'            => $term->term_id,
 				'include_children' => false,
@@ -142,7 +142,7 @@ function mfs_render_manager_cards( $term ) {
 		// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 		$args['tax_query'] = array(
 			array(
-				'taxonomy' => 'mfs_folder',
+				'taxonomy' => 'mulino_folder',
 				'operator' => 'NOT EXISTS',
 			),
 		);
@@ -151,21 +151,21 @@ function mfs_render_manager_cards( $term ) {
 	$docs = get_posts( $args );
 
 	if ( empty( $docs ) ) {
-		return '<p class="mfs-empty">' . esc_html__( 'No documents here yet. Drag files onto the drop zone above.', 'mulino-file-show' ) . '</p>';
+		return '<p class="mulino-empty">' . esc_html__( 'No documents here yet. Drag files onto the drop zone above.', 'mulino-file-show' ) . '</p>';
 	}
 
 	$out = '';
 	foreach ( $docs as $doc ) {
-		$out .= mfs_render_one_manager_card( $doc );
+		$out .= mulino_render_one_manager_card( $doc );
 	}
 
 	return $out;
 }
 
-function mfs_render_one_manager_card( $doc ) {
-	$attachment_id = (int) get_post_meta( $doc->ID, '_mfs_file_id', true );
+function mulino_render_one_manager_card( $doc ) {
+	$attachment_id = (int) get_post_meta( $doc->ID, '_mulino_file_id', true );
 	$url           = $attachment_id ? wp_get_attachment_url( $attachment_id ) : '';
-	$icon          = $url ? mfs_get_file_type( $url ) : array(
+	$icon          = $url ? mulino_get_file_type( $url ) : array(
 		'label' => '?',
 		'color' => '#999999',
 	);
@@ -176,20 +176,20 @@ function mfs_render_one_manager_card( $doc ) {
 	 * link a premium add-on wants to show per document).
 	 *
 	 * @param string  $html Extra markup to append. Empty by default.
-	 * @param WP_Post $doc  The mfs_document post this card is for.
+	 * @param WP_Post $doc  The mulino_document post this card is for.
 	 */
-	$extra_actions = apply_filters( 'mfs_manager_card_actions', '', $doc );
+	$extra_actions = apply_filters( 'mulino_manager_card_actions', '', $doc );
 
-	return '<div class="mfs-card mfs-manager-card" draggable="true" data-doc-id="' . esc_attr( $doc->ID ) . '" data-doc-name="' . esc_attr( get_the_title( $doc ) ) . '">'
-		. mfs_file_icon_svg( $icon['label'], $icon['color'] )
-		. '<span class="mfs-name">' . esc_html( get_the_title( $doc ) ) . '</span>'
-		. '<button type="button" class="mfs-rename" data-doc-id="' . esc_attr( $doc->ID ) . '" title="' . esc_attr__( 'Rename', 'mulino-file-show' ) . '">&#9998;</button>'
-		. '<button type="button" class="mfs-delete" data-doc-id="' . esc_attr( $doc->ID ) . '" title="' . esc_attr__( 'Delete', 'mulino-file-show' ) . '">&times;</button>'
+	return '<div class="mulino-card mulino-manager-card" draggable="true" data-doc-id="' . esc_attr( $doc->ID ) . '" data-doc-name="' . esc_attr( get_the_title( $doc ) ) . '">'
+		. mulino_file_icon_svg( $icon['label'], $icon['color'] )
+		. '<span class="mulino-name">' . esc_html( get_the_title( $doc ) ) . '</span>'
+		. '<button type="button" class="mulino-rename" data-doc-id="' . esc_attr( $doc->ID ) . '" title="' . esc_attr__( 'Rename', 'mulino-file-show' ) . '">&#9998;</button>'
+		. '<button type="button" class="mulino-delete" data-doc-id="' . esc_attr( $doc->ID ) . '" title="' . esc_attr__( 'Delete', 'mulino-file-show' ) . '">&times;</button>'
 		. wp_kses_post( $extra_actions )
 		. '</div>';
 }
 
-function mfs_render_manager_page() {
+function mulino_render_manager_page() {
 	if ( ! current_user_can( 'edit_posts' ) ) {
 		wp_die( esc_html__( 'You do not have permission to access this page.', 'mulino-file-show' ) );
 	}
@@ -198,7 +198,7 @@ function mfs_render_manager_page() {
 	// a state-changing action, so nonce verification doesn't apply.
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$selected_slug = isset( $_GET['folder'] ) ? sanitize_title( wp_unslash( $_GET['folder'] ) ) : '';
-	$selected_term = $selected_slug ? get_term_by( 'slug', $selected_slug, 'mfs_folder' ) : false;
+	$selected_term = $selected_slug ? get_term_by( 'slug', $selected_slug, 'mulino_folder' ) : false;
 	$selected_id   = $selected_term ? $selected_term->term_id : 0;
 	$root_url      = remove_query_arg( 'folder' );
 	?>
@@ -214,31 +214,31 @@ function mfs_render_manager_page() {
 		 *
 		 * @param string $html Extra markup to print. Empty by default.
 		 */
-		echo wp_kses_post( apply_filters( 'mfs_manager_toolbar', '' ) );
+		echo wp_kses_post( apply_filters( 'mulino_manager_toolbar', '' ) );
 		?>
 
-		<div id="mfs-manager">
-			<div class="mfs-tree-pane">
-				<button type="button" id="mfs-new-folder" class="button"><?php esc_html_e( '+ New folder', 'mulino-file-show' ); ?></button>
-				<ul class="mfs-tree" id="mfs-tree">
-					<li class="mfs-tree-item<?php echo ( 0 === $selected_id ) ? ' is-selected' : ''; ?>" data-term-id="0">
-						<a href="<?php echo esc_url( $root_url ); ?>" class="mfs-tree-link"><?php esc_html_e( 'All', 'mulino-file-show' ); ?></a>
+		<div id="mulino-manager">
+			<div class="mulino-tree-pane">
+				<button type="button" id="mulino-new-folder" class="button"><?php esc_html_e( '+ New folder', 'mulino-file-show' ); ?></button>
+				<ul class="mulino-tree" id="mulino-tree">
+					<li class="mulino-tree-item<?php echo ( 0 === $selected_id ) ? ' is-selected' : ''; ?>" data-term-id="0">
+						<a href="<?php echo esc_url( $root_url ); ?>" class="mulino-tree-link"><?php esc_html_e( 'All', 'mulino-file-show' ); ?></a>
 						<?php
 						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- each value is escaped individually inside this function before being concatenated into the returned HTML string.
-						echo mfs_render_folder_tree( 0, $selected_id );
+						echo mulino_render_folder_tree( 0, $selected_id );
 						?>
 					</li>
 				</ul>
 			</div>
 
-			<div class="mfs-files-pane">
-				<div id="mfs-dropzone" data-folder-id="<?php echo esc_attr( $selected_id ); ?>">
+			<div class="mulino-files-pane">
+				<div id="mulino-dropzone" data-folder-id="<?php echo esc_attr( $selected_id ); ?>">
 					<p><?php esc_html_e( 'Drag files here to upload', 'mulino-file-show' ); ?></p>
 				</div>
-				<div class="mfs-grid" id="mfs-file-grid">
+				<div class="mulino-grid" id="mulino-file-grid">
 					<?php
 					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- each value is escaped individually inside this function before being concatenated into the returned HTML string.
-					echo mfs_render_manager_cards( $selected_term );
+					echo mulino_render_manager_cards( $selected_term );
 					?>
 				</div>
 			</div>
@@ -247,8 +247,8 @@ function mfs_render_manager_page() {
 	<?php
 }
 
-function mfs_ajax_upload() {
-	check_ajax_referer( 'mfs_manager_nonce', 'nonce' );
+function mulino_ajax_upload() {
+	check_ajax_referer( 'mulino_manager_nonce', 'nonce' );
 
 	if ( ! current_user_can( 'edit_posts' ) ) {
 		wp_send_json_error( array( 'message' => __( 'Not allowed.', 'mulino-file-show' ) ), 403 );
@@ -269,7 +269,7 @@ function mfs_ajax_upload() {
 	$title   = get_the_title( $attachment_id );
 	$post_id = wp_insert_post(
 		array(
-			'post_type'   => 'mfs_document',
+			'post_type'   => 'mulino_document',
 			'post_title'  => $title ? $title : __( 'Untitled document', 'mulino-file-show' ),
 			'post_status' => 'publish',
 		),
@@ -279,11 +279,11 @@ function mfs_ajax_upload() {
 		wp_send_json_error( array( 'message' => $post_id->get_error_message() ) );
 	}
 
-	update_post_meta( $post_id, '_mfs_file_id', $attachment_id );
+	update_post_meta( $post_id, '_mulino_file_id', $attachment_id );
 
 	$folder_id = isset( $_POST['folder_id'] ) ? absint( $_POST['folder_id'] ) : 0;
-	if ( $folder_id && get_term( $folder_id, 'mfs_folder' ) && ! is_wp_error( get_term( $folder_id, 'mfs_folder' ) ) ) {
-		wp_set_object_terms( $post_id, array( $folder_id ), 'mfs_folder' );
+	if ( $folder_id && get_term( $folder_id, 'mulino_folder' ) && ! is_wp_error( get_term( $folder_id, 'mulino_folder' ) ) ) {
+		wp_set_object_terms( $post_id, array( $folder_id ), 'mulino_folder' );
 	}
 
 	/**
@@ -291,34 +291,34 @@ function mfs_ajax_upload() {
 	 * the AJAX response is sent. $folder_id is 0 if it was uploaded to
 	 * the root ("no folder") view.
 	 *
-	 * @param int $post_id       The new mfs_document post ID.
+	 * @param int $post_id       The new mulino_document post ID.
 	 * @param int $attachment_id The underlying WordPress attachment ID.
-	 * @param int $folder_id     The mfs_folder term ID it was filed into, or 0.
+	 * @param int $folder_id     The mulino_folder term ID it was filed into, or 0.
 	 */
-	do_action( 'mfs_after_upload', $post_id, $attachment_id, $folder_id );
+	do_action( 'mulino_after_upload', $post_id, $attachment_id, $folder_id );
 
-	wp_send_json_success( array( 'html' => mfs_render_one_manager_card( get_post( $post_id ) ) ) );
+	wp_send_json_success( array( 'html' => mulino_render_one_manager_card( get_post( $post_id ) ) ) );
 }
-add_action( 'wp_ajax_mfs_upload', 'mfs_ajax_upload' );
+add_action( 'wp_ajax_mulino_upload', 'mulino_ajax_upload' );
 
-function mfs_ajax_move() {
-	check_ajax_referer( 'mfs_manager_nonce', 'nonce' );
+function mulino_ajax_move() {
+	check_ajax_referer( 'mulino_manager_nonce', 'nonce' );
 
 	$doc_id = isset( $_POST['doc_id'] ) ? absint( $_POST['doc_id'] ) : 0;
-	if ( ! $doc_id || 'mfs_document' !== get_post_type( $doc_id ) || ! current_user_can( 'edit_post', $doc_id ) ) {
+	if ( ! $doc_id || 'mulino_document' !== get_post_type( $doc_id ) || ! current_user_can( 'edit_post', $doc_id ) ) {
 		wp_send_json_error( array( 'message' => __( 'Not allowed.', 'mulino-file-show' ) ), 403 );
 	}
 
 	$folder_id = isset( $_POST['folder_id'] ) ? absint( $_POST['folder_id'] ) : 0;
 
 	if ( $folder_id ) {
-		$term = get_term( $folder_id, 'mfs_folder' );
+		$term = get_term( $folder_id, 'mulino_folder' );
 		if ( ! $term || is_wp_error( $term ) ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid folder.', 'mulino-file-show' ) ) );
 		}
-		wp_set_object_terms( $doc_id, array( $folder_id ), 'mfs_folder' );
+		wp_set_object_terms( $doc_id, array( $folder_id ), 'mulino_folder' );
 	} else {
-		wp_set_object_terms( $doc_id, array(), 'mfs_folder' );
+		wp_set_object_terms( $doc_id, array(), 'mulino_folder' );
 	}
 
 	/**
@@ -326,20 +326,20 @@ function mfs_ajax_move() {
 	 * different) folder. $folder_id is 0 if it was moved to the root
 	 * ("no folder") view.
 	 *
-	 * @param int $doc_id    The mfs_document post ID that moved.
-	 * @param int $folder_id The mfs_folder term ID it now belongs to, or 0.
+	 * @param int $doc_id    The mulino_document post ID that moved.
+	 * @param int $folder_id The mulino_folder term ID it now belongs to, or 0.
 	 */
-	do_action( 'mfs_after_move', $doc_id, $folder_id );
+	do_action( 'mulino_after_move', $doc_id, $folder_id );
 
 	wp_send_json_success();
 }
-add_action( 'wp_ajax_mfs_move', 'mfs_ajax_move' );
+add_action( 'wp_ajax_mulino_move', 'mulino_ajax_move' );
 
-function mfs_ajax_rename_doc() {
-	check_ajax_referer( 'mfs_manager_nonce', 'nonce' );
+function mulino_ajax_rename_doc() {
+	check_ajax_referer( 'mulino_manager_nonce', 'nonce' );
 
 	$doc_id = isset( $_POST['doc_id'] ) ? absint( $_POST['doc_id'] ) : 0;
-	if ( ! $doc_id || 'mfs_document' !== get_post_type( $doc_id ) || ! current_user_can( 'edit_post', $doc_id ) ) {
+	if ( ! $doc_id || 'mulino_document' !== get_post_type( $doc_id ) || ! current_user_can( 'edit_post', $doc_id ) ) {
 		wp_send_json_error( array( 'message' => __( 'Not allowed.', 'mulino-file-show' ) ), 403 );
 	}
 
@@ -362,17 +362,17 @@ function mfs_ajax_rename_doc() {
 	/**
 	 * Fires after a document has been renamed.
 	 *
-	 * @param int    $doc_id The mfs_document post ID that was renamed.
+	 * @param int    $doc_id The mulino_document post ID that was renamed.
 	 * @param string $name   Its new title.
 	 */
-	do_action( 'mfs_after_rename_doc', $doc_id, $name );
+	do_action( 'mulino_after_rename_doc', $doc_id, $name );
 
 	wp_send_json_success( array( 'name' => $name ) );
 }
-add_action( 'wp_ajax_mfs_rename_doc', 'mfs_ajax_rename_doc' );
+add_action( 'wp_ajax_mulino_rename_doc', 'mulino_ajax_rename_doc' );
 
-function mfs_ajax_move_folder() {
-	check_ajax_referer( 'mfs_manager_nonce', 'nonce' );
+function mulino_ajax_move_folder() {
+	check_ajax_referer( 'mulino_manager_nonce', 'nonce' );
 
 	if ( ! current_user_can( 'edit_posts' ) ) {
 		wp_send_json_error( array( 'message' => __( 'Not allowed.', 'mulino-file-show' ) ), 403 );
@@ -381,7 +381,7 @@ function mfs_ajax_move_folder() {
 	$term_id       = isset( $_POST['term_id'] ) ? absint( $_POST['term_id'] ) : 0;
 	$new_parent_id = isset( $_POST['new_parent_id'] ) ? absint( $_POST['new_parent_id'] ) : 0;
 
-	$term = $term_id ? get_term( $term_id, 'mfs_folder' ) : null;
+	$term = $term_id ? get_term( $term_id, 'mulino_folder' ) : null;
 	if ( ! $term_id || ! $term || is_wp_error( $term ) ) {
 		wp_send_json_error( array( 'message' => __( 'Invalid folder.', 'mulino-file-show' ) ) );
 	}
@@ -391,7 +391,7 @@ function mfs_ajax_move_folder() {
 	}
 
 	if ( $new_parent_id ) {
-		$new_parent = get_term( $new_parent_id, 'mfs_folder' );
+		$new_parent = get_term( $new_parent_id, 'mulino_folder' );
 		if ( ! $new_parent || is_wp_error( $new_parent ) ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid target folder.', 'mulino-file-show' ) ) );
 		}
@@ -400,7 +400,7 @@ function mfs_ajax_move_folder() {
 		// would create a cycle the taxonomy tree can't represent.
 		$descendant_ids = get_terms(
 			array(
-				'taxonomy'   => 'mfs_folder',
+				'taxonomy'   => 'mulino_folder',
 				'child_of'   => $term_id,
 				'hide_empty' => false,
 				'fields'     => 'ids',
@@ -411,7 +411,7 @@ function mfs_ajax_move_folder() {
 		}
 	}
 
-	$result = wp_update_term( $term_id, 'mfs_folder', array( 'parent' => $new_parent_id ) );
+	$result = wp_update_term( $term_id, 'mulino_folder', array( 'parent' => $new_parent_id ) );
 	if ( is_wp_error( $result ) ) {
 		wp_send_json_error( array( 'message' => $result->get_error_message() ) );
 	}
@@ -419,17 +419,17 @@ function mfs_ajax_move_folder() {
 	/**
 	 * Fires after a folder has been re-parented.
 	 *
-	 * @param int $term_id       The mfs_folder term ID that moved.
+	 * @param int $term_id       The mulino_folder term ID that moved.
 	 * @param int $new_parent_id Its new parent term ID, or 0 for top-level.
 	 */
-	do_action( 'mfs_after_folder_moved', $term_id, $new_parent_id );
+	do_action( 'mulino_after_folder_moved', $term_id, $new_parent_id );
 
 	wp_send_json_success();
 }
-add_action( 'wp_ajax_mfs_move_folder', 'mfs_ajax_move_folder' );
+add_action( 'wp_ajax_mulino_move_folder', 'mulino_ajax_move_folder' );
 
-function mfs_ajax_create_folder() {
-	check_ajax_referer( 'mfs_manager_nonce', 'nonce' );
+function mulino_ajax_create_folder() {
+	check_ajax_referer( 'mulino_manager_nonce', 'nonce' );
 
 	if ( ! current_user_can( 'edit_posts' ) ) {
 		wp_send_json_error( array( 'message' => __( 'Not allowed.', 'mulino-file-show' ) ), 403 );
@@ -442,7 +442,7 @@ function mfs_ajax_create_folder() {
 		wp_send_json_error( array( 'message' => __( 'Folder name is required.', 'mulino-file-show' ) ) );
 	}
 
-	$result = wp_insert_term( $name, 'mfs_folder', array( 'parent' => $parent_id ) );
+	$result = wp_insert_term( $name, 'mulino_folder', array( 'parent' => $parent_id ) );
 	if ( is_wp_error( $result ) ) {
 		wp_send_json_error( array( 'message' => $result->get_error_message() ) );
 	}
@@ -450,24 +450,24 @@ function mfs_ajax_create_folder() {
 	/**
 	 * Fires after a new folder has been created.
 	 *
-	 * @param int $term_id   The new mfs_folder term ID.
+	 * @param int $term_id   The new mulino_folder term ID.
 	 * @param int $parent_id Its parent term ID, or 0 for top-level.
 	 */
-	do_action( 'mfs_after_folder_created', $result['term_id'], $parent_id );
+	do_action( 'mulino_after_folder_created', $result['term_id'], $parent_id );
 
 	wp_send_json_success( $result );
 }
-add_action( 'wp_ajax_mfs_create_folder', 'mfs_ajax_create_folder' );
+add_action( 'wp_ajax_mulino_create_folder', 'mulino_ajax_create_folder' );
 
-function mfs_ajax_rename_folder() {
-	check_ajax_referer( 'mfs_manager_nonce', 'nonce' );
+function mulino_ajax_rename_folder() {
+	check_ajax_referer( 'mulino_manager_nonce', 'nonce' );
 
 	if ( ! current_user_can( 'edit_posts' ) ) {
 		wp_send_json_error( array( 'message' => __( 'Not allowed.', 'mulino-file-show' ) ), 403 );
 	}
 
 	$term_id = isset( $_POST['term_id'] ) ? absint( $_POST['term_id'] ) : 0;
-	$term    = $term_id ? get_term( $term_id, 'mfs_folder' ) : null;
+	$term    = $term_id ? get_term( $term_id, 'mulino_folder' ) : null;
 	if ( ! $term_id || ! $term || is_wp_error( $term ) ) {
 		wp_send_json_error( array( 'message' => __( 'Invalid folder.', 'mulino-file-show' ) ) );
 	}
@@ -477,7 +477,7 @@ function mfs_ajax_rename_folder() {
 		wp_send_json_error( array( 'message' => __( 'Folder name cannot be empty.', 'mulino-file-show' ) ) );
 	}
 
-	$result = wp_update_term( $term_id, 'mfs_folder', array( 'name' => $name ) );
+	$result = wp_update_term( $term_id, 'mulino_folder', array( 'name' => $name ) );
 	if ( is_wp_error( $result ) ) {
 		wp_send_json_error( array( 'message' => $result->get_error_message() ) );
 	}
@@ -485,20 +485,20 @@ function mfs_ajax_rename_folder() {
 	/**
 	 * Fires after a folder has been renamed.
 	 *
-	 * @param int    $term_id The mfs_folder term ID that was renamed.
+	 * @param int    $term_id The mulino_folder term ID that was renamed.
 	 * @param string $name    Its new name.
 	 */
-	do_action( 'mfs_after_folder_renamed', $term_id, $name );
+	do_action( 'mulino_after_folder_renamed', $term_id, $name );
 
 	wp_send_json_success( array( 'name' => $name ) );
 }
-add_action( 'wp_ajax_mfs_rename_folder', 'mfs_ajax_rename_folder' );
+add_action( 'wp_ajax_mulino_rename_folder', 'mulino_ajax_rename_folder' );
 
-function mfs_ajax_delete_doc() {
-	check_ajax_referer( 'mfs_manager_nonce', 'nonce' );
+function mulino_ajax_delete_doc() {
+	check_ajax_referer( 'mulino_manager_nonce', 'nonce' );
 
 	$doc_id = isset( $_POST['doc_id'] ) ? absint( $_POST['doc_id'] ) : 0;
-	if ( ! $doc_id || 'mfs_document' !== get_post_type( $doc_id ) || ! current_user_can( 'delete_post', $doc_id ) ) {
+	if ( ! $doc_id || 'mulino_document' !== get_post_type( $doc_id ) || ! current_user_can( 'delete_post', $doc_id ) ) {
 		wp_send_json_error( array( 'message' => __( 'Not allowed.', 'mulino-file-show' ) ), 403 );
 	}
 
@@ -507,23 +507,23 @@ function mfs_ajax_delete_doc() {
 	/**
 	 * Fires after a document post has been moved to the trash.
 	 *
-	 * @param int $doc_id The mfs_document post ID that was trashed.
+	 * @param int $doc_id The mulino_document post ID that was trashed.
 	 */
-	do_action( 'mfs_after_delete_doc', $doc_id );
+	do_action( 'mulino_after_delete_doc', $doc_id );
 
 	wp_send_json_success();
 }
-add_action( 'wp_ajax_mfs_delete_doc', 'mfs_ajax_delete_doc' );
+add_action( 'wp_ajax_mulino_delete_doc', 'mulino_ajax_delete_doc' );
 
-function mfs_ajax_delete_folder() {
-	check_ajax_referer( 'mfs_manager_nonce', 'nonce' );
+function mulino_ajax_delete_folder() {
+	check_ajax_referer( 'mulino_manager_nonce', 'nonce' );
 
 	if ( ! current_user_can( 'edit_posts' ) ) {
 		wp_send_json_error( array( 'message' => __( 'Not allowed.', 'mulino-file-show' ) ), 403 );
 	}
 
 	$term_id = isset( $_POST['term_id'] ) ? absint( $_POST['term_id'] ) : 0;
-	$term    = $term_id ? get_term( $term_id, 'mfs_folder' ) : null;
+	$term    = $term_id ? get_term( $term_id, 'mulino_folder' ) : null;
 	if ( ! $term_id || ! $term || is_wp_error( $term ) ) {
 		wp_send_json_error( array( 'message' => __( 'Invalid folder.', 'mulino-file-show' ) ) );
 	}
@@ -531,7 +531,7 @@ function mfs_ajax_delete_folder() {
 	// Refuse to delete a folder that still has subfolders.
 	$children = get_terms(
 		array(
-			'taxonomy'   => 'mfs_folder',
+			'taxonomy'   => 'mulino_folder',
 			'parent'     => $term_id,
 			'hide_empty' => false,
 			'fields'     => 'ids',
@@ -544,7 +544,7 @@ function mfs_ajax_delete_folder() {
 	// Refuse to delete a folder that still has documents directly in it.
 	$docs = get_posts(
 		array(
-			'post_type'      => 'mfs_document',
+			'post_type'      => 'mulino_document',
 			'posts_per_page' => 1,
 			'fields'         => 'ids',
 			// Scoped to one specific folder term, and capped at 1
@@ -552,7 +552,7 @@ function mfs_ajax_delete_folder() {
 			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 			'tax_query'      => array(
 				array(
-					'taxonomy'         => 'mfs_folder',
+					'taxonomy'         => 'mulino_folder',
 					'field'            => 'term_id',
 					'terms'            => $term_id,
 					'include_children' => false,
@@ -564,7 +564,7 @@ function mfs_ajax_delete_folder() {
 		wp_send_json_error( array( 'message' => __( 'This folder still has documents in it. Move or delete those first.', 'mulino-file-show' ) ) );
 	}
 
-	$deleted = wp_delete_term( $term_id, 'mfs_folder' );
+	$deleted = wp_delete_term( $term_id, 'mulino_folder' );
 	if ( is_wp_error( $deleted ) || ! $deleted ) {
 		wp_send_json_error( array( 'message' => __( 'Could not delete folder.', 'mulino-file-show' ) ) );
 	}
@@ -572,10 +572,10 @@ function mfs_ajax_delete_folder() {
 	/**
 	 * Fires after a (now-empty) folder has been deleted.
 	 *
-	 * @param int $term_id The mfs_folder term ID that was deleted.
+	 * @param int $term_id The mulino_folder term ID that was deleted.
 	 */
-	do_action( 'mfs_after_folder_deleted', $term_id );
+	do_action( 'mulino_after_folder_deleted', $term_id );
 
 	wp_send_json_success();
 }
-add_action( 'wp_ajax_mfs_delete_folder', 'mfs_ajax_delete_folder' );
+add_action( 'wp_ajax_mulino_delete_folder', 'mulino_ajax_delete_folder' );

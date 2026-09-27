@@ -45,7 +45,7 @@ Not yet published on the WordPress.org plugin directory. Until then:
 - Manage folders and documents under **Mulino file show** in the admin menu.
 - Drop a file onto the drop zone to upload it into the currently open
   folder; drag a file card or a folder in the tree to re-file it.
-- Add the `[mfs_documents]` shortcode to any page or post to
+- Add the `[mulino_documents]` shortcode to any page or post to
   show the public, browsable folder view.
 
 ## Extending

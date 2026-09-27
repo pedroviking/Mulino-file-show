@@ -7,7 +7,7 @@
  * WP_Mock::setUp() / WP_Mock::tearDown() (and closing Mockery) around
  * every test for us.
  */
-class MFS_TestCase extends \WP_Mock\Tools\TestCase {
+class MULINO_TestCase extends \WP_Mock\Tools\TestCase {
 
 	public function setUp(): void {
 		parent::setUp();
@@ -28,7 +28,7 @@ class MFS_TestCase extends \WP_Mock\Tools\TestCase {
 	 * through so we can make assertions on the surrounding HTML.
 	 *
 	 * Call this from a test's setUp() (or at the top of an individual
-	 * test) before invoking any mfs_* function.
+	 * test) before invoking any mulino_* function.
 	 */
 	protected function mock_escaping_functions() {
 		foreach ( array( 'esc_html', 'esc_url', 'esc_attr', 'esc_html__', 'esc_attr__', '__' ) as $function ) {

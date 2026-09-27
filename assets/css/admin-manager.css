@@ -1,12 +1,12 @@
-	#mfs-manager { display: flex; gap: 2em; margin-top: 1.5em; align-items: flex-start; }
-	.mfs-tree-pane { width: 240px; flex-shrink: 0; background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 1em; }
-	.mfs-grid {
+	#mulino-manager { display: flex; gap: 2em; margin-top: 1.5em; align-items: flex-start; }
+	.mulino-tree-pane { width: 240px; flex-shrink: 0; background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 1em; }
+	.mulino-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
 		gap: 1.25em;
 		margin: 0 0 1.5em;
 	}
-	.mfs-card {
+	.mulino-card {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -19,44 +19,44 @@
 		color: #333;
 		transition: box-shadow .15s ease, transform .15s ease, border-color .15s ease;
 	}
-	.mfs-card:hover {
+	.mulino-card:hover {
 		box-shadow: 0 6px 16px rgba(0,0,0,.08);
 		transform: translateY(-2px);
 		border-color: #ccc;
 	}
-	.mfs-icon {
+	.mulino-icon {
 		width: 56px;
 		height: 56px;
 		margin-bottom: 0.6em;
 	}
-	.mfs-name {
+	.mulino-name {
 		font-size: 0.85em;
 		line-height: 1.3;
 		word-break: break-word;
 	}
-	.mfs-tree, .mfs-subtree { list-style: none; margin: 0.5em 0 0; padding-left: 1em; }
-	.mfs-tree { padding-left: 0; }
-	.mfs-tree-row { display: flex; align-items: center; justify-content: space-between; border-radius: 5px; cursor: grab; }
-	.mfs-tree-row.is-dragging { opacity: 0.4; }
-	.mfs-tree-item > .mfs-tree-row > .mfs-tree-link { flex-grow: 1; display: block; padding: 0.35em 0.5em; text-decoration: none; color: #333; border-radius: 5px; }
-	.mfs-tree-item.is-selected > .mfs-tree-row > .mfs-tree-link { background: #2271b1; color: #fff; }
-	.mfs-tree-item.is-dragover > .mfs-tree-row > .mfs-tree-link { background: #d7e9c9; outline: 2px dashed #46b450; }
-	.mfs-tree-delete {
+	.mulino-tree, .mulino-subtree { list-style: none; margin: 0.5em 0 0; padding-left: 1em; }
+	.mulino-tree { padding-left: 0; }
+	.mulino-tree-row { display: flex; align-items: center; justify-content: space-between; border-radius: 5px; cursor: grab; }
+	.mulino-tree-row.is-dragging { opacity: 0.4; }
+	.mulino-tree-item > .mulino-tree-row > .mulino-tree-link { flex-grow: 1; display: block; padding: 0.35em 0.5em; text-decoration: none; color: #333; border-radius: 5px; }
+	.mulino-tree-item.is-selected > .mulino-tree-row > .mulino-tree-link { background: #2271b1; color: #fff; }
+	.mulino-tree-item.is-dragover > .mulino-tree-row > .mulino-tree-link { background: #d7e9c9; outline: 2px dashed #46b450; }
+	.mulino-tree-delete {
 		flex-shrink: 0; width: 20px; height: 20px; line-height: 18px; margin-right: 0.25em;
 		border: none; border-radius: 50%; background: transparent; color: #999;
 		cursor: pointer; font-size: 14px; padding: 0; opacity: 0; transition: opacity .1s;
 	}
-	.mfs-tree-rename {
+	.mulino-tree-rename {
 		flex-shrink: 0; width: 20px; height: 20px; line-height: 18px; margin-right: 0.15em;
 		border: none; border-radius: 50%; background: transparent; color: #999;
 		cursor: pointer; font-size: 12px; padding: 0; opacity: 0; transition: opacity .1s;
 	}
-	.mfs-tree-row:hover .mfs-tree-delete,
-	.mfs-tree-row:hover .mfs-tree-rename { opacity: 1; }
-	.mfs-tree-delete:hover { background: #d63638; color: #fff; }
-	.mfs-tree-rename:hover { background: #2271b1; color: #fff; }
-	.mfs-files-pane { flex-grow: 1; }
-	#mfs-dropzone {
+	.mulino-tree-row:hover .mulino-tree-delete,
+	.mulino-tree-row:hover .mulino-tree-rename { opacity: 1; }
+	.mulino-tree-delete:hover { background: #d63638; color: #fff; }
+	.mulino-tree-rename:hover { background: #2271b1; color: #fff; }
+	.mulino-files-pane { flex-grow: 1; }
+	#mulino-dropzone {
 		border: 2px dashed #b5b5b5;
 		border-radius: 8px;
 		padding: 2em;
@@ -65,21 +65,21 @@
 		margin-bottom: 1.5em;
 		background: #fafafa;
 	}
-	#mfs-dropzone.is-dragover { border-color: #2271b1; background: #eef6fc; color: #2271b1; }
-	.mfs-manager-card { position: relative; cursor: grab; }
-	.mfs-manager-card.is-dragging { opacity: 0.4; }
-	.mfs-rename {
+	#mulino-dropzone.is-dragover { border-color: #2271b1; background: #eef6fc; color: #2271b1; }
+	.mulino-manager-card { position: relative; cursor: grab; }
+	.mulino-manager-card.is-dragging { opacity: 0.4; }
+	.mulino-rename {
 		position: absolute; top: 4px; right: 26px;
 		width: 20px; height: 20px; line-height: 18px;
 		border: none; border-radius: 50%; background: #e5e5e5; color: #555;
 		cursor: pointer; font-size: 12px; padding: 0;
 	}
-	.mfs-rename:hover { background: #2271b1; color: #fff; }
-	.mfs-delete {
+	.mulino-rename:hover { background: #2271b1; color: #fff; }
+	.mulino-delete {
 		position: absolute; top: 4px; right: 4px;
 		width: 20px; height: 20px; line-height: 18px;
 		border: none; border-radius: 50%; background: #e5e5e5; color: #555;
 		cursor: pointer; font-size: 14px; padding: 0;
 	}
-	.mfs-delete:hover { background: #d63638; color: #fff; }
-	.mfs-empty { font-style: italic; color: #777; }
+	.mulino-delete:hover { background: #d63638; color: #fff; }
+	.mulino-empty { font-style: italic; color: #777; }

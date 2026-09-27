@@ -1,20 +1,20 @@
-.mfs-browser { max-width: 900px; }
-.mfs-breadcrumb {
+.mulino-browser { max-width: 900px; }
+.mulino-breadcrumb {
 	margin-bottom: 1.25em;
 	font-size: 0.95em;
 	color: #555;
 }
-.mfs-breadcrumb a { color: #2271b1; text-decoration: none; }
-.mfs-breadcrumb a:hover { text-decoration: underline; }
-.mfs-breadcrumb .mfs-current { font-weight: 600; color: #23282d; }
+.mulino-breadcrumb a { color: #2271b1; text-decoration: none; }
+.mulino-breadcrumb a:hover { text-decoration: underline; }
+.mulino-breadcrumb .mulino-current { font-weight: 600; color: #23282d; }
 
-.mfs-grid {
+.mulino-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
 	gap: 1.25em;
 	margin: 0 0 1.75em;
 }
-.mfs-card {
+.mulino-card {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -27,20 +27,20 @@
 	color: #333;
 	transition: box-shadow .15s ease, transform .15s ease, border-color .15s ease;
 }
-.mfs-card:hover {
+.mulino-card:hover {
 	box-shadow: 0 6px 16px rgba(0,0,0,.08);
 	transform: translateY(-2px);
 	border-color: #ccc;
 	color: #333;
 }
-.mfs-icon {
+.mulino-icon {
 	width: 56px;
 	height: 56px;
 	margin-bottom: 0.6em;
 }
-.mfs-name {
+.mulino-name {
 	font-size: 0.85em;
 	line-height: 1.3;
 	word-break: break-word;
 }
-.mfs-empty { font-style: italic; color: #777; }
+.mulino-empty { font-style: italic; color: #777; }

@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/TestCase.php';
 
-class HelpersTest extends MFS_TestCase {
+class HelpersTest extends MULINO_TestCase {
 
 	protected function mock_wp_parse_url() {
 		// wp_parse_url() is WordPress's own wrapper around PHP's native
@@ -20,7 +20,7 @@ class HelpersTest extends MFS_TestCase {
 	public function test_pdf_extension_gets_red_pdf_badge() {
 		$this->mock_wp_parse_url();
 
-		$result = mfs_get_file_type( 'https://example.test/uploads/2026/09/minutes.pdf' );
+		$result = mulino_get_file_type( 'https://example.test/uploads/2026/09/minutes.pdf' );
 
 		$this->assertSame( 'PDF', $result['label'] );
 		$this->assertSame( '#e2574c', $result['color'] );
@@ -29,7 +29,7 @@ class HelpersTest extends MFS_TestCase {
 	public function test_extension_matching_is_case_insensitive() {
 		$this->mock_wp_parse_url();
 
-		$result = mfs_get_file_type( 'https://example.test/uploads/Budget.XLSX' );
+		$result = mulino_get_file_type( 'https://example.test/uploads/Budget.XLSX' );
 
 		$this->assertSame( 'XLS', $result['label'] );
 	}
@@ -37,8 +37,8 @@ class HelpersTest extends MFS_TestCase {
 	public function test_docx_and_doc_share_the_same_badge() {
 		$this->mock_wp_parse_url();
 
-		$doc  = mfs_get_file_type( 'https://example.test/uploads/report.doc' );
-		$docx = mfs_get_file_type( 'https://example.test/uploads/report.docx' );
+		$doc  = mulino_get_file_type( 'https://example.test/uploads/report.doc' );
+		$docx = mulino_get_file_type( 'https://example.test/uploads/report.docx' );
 
 		$this->assertSame( $doc, $docx );
 	}
@@ -46,7 +46,7 @@ class HelpersTest extends MFS_TestCase {
 	public function test_unknown_extension_falls_back_to_generic_grey_badge() {
 		$this->mock_wp_parse_url();
 
-		$result = mfs_get_file_type( 'https://example.test/uploads/archive.rar' );
+		$result = mulino_get_file_type( 'https://example.test/uploads/archive.rar' );
 
 		$this->assertSame( 'RAR', $result['label'] );
 		$this->assertSame( '#607d8b', $result['color'] );
@@ -55,7 +55,7 @@ class HelpersTest extends MFS_TestCase {
 	public function test_url_with_no_extension_returns_fil_placeholder() {
 		$this->mock_wp_parse_url();
 
-		$result = mfs_get_file_type( 'https://example.test/uploads/README' );
+		$result = mulino_get_file_type( 'https://example.test/uploads/README' );
 
 		$this->assertSame( 'FIL', $result['label'] );
 	}
@@ -65,7 +65,7 @@ class HelpersTest extends MFS_TestCase {
 
 		// The extension check should look at the URL path only, so a
 		// cache-busting query string shouldn't confuse it.
-		$result = mfs_get_file_type( 'https://example.test/uploads/minutes.pdf?ver=abc123' );
+		$result = mulino_get_file_type( 'https://example.test/uploads/minutes.pdf?ver=abc123' );
 
 		$this->assertSame( 'PDF', $result['label'] );
 	}
@@ -73,7 +73,7 @@ class HelpersTest extends MFS_TestCase {
 	public function test_file_icon_svg_embeds_the_label_and_color() {
 		$this->mock_escaping_functions();
 
-		$svg = mfs_file_icon_svg( 'PDF', '#e2574c' );
+		$svg = mulino_file_icon_svg( 'PDF', '#e2574c' );
 
 		$this->assertStringStartsWith( '<svg', trim( $svg ) );
 		$this->assertStringContainsString( 'PDF', $svg );

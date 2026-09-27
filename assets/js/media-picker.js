@@ -3,7 +3,7 @@ jQuery( function ( $ ) {
 
 	var frame;
 
-	$( '#mfs_select_file' ).on( 'click', function ( e ) {
+	$( '#mulino_select_file' ).on( 'click', function ( e ) {
 		e.preventDefault();
 
 		if ( frame ) {
@@ -12,15 +12,15 @@ jQuery( function ( $ ) {
 		}
 
 		frame = wp.media( {
-			title: mfsMediaPicker.title,
-			button: { text: mfsMediaPicker.buttonText },
+			title: mulinoMediaPicker.title,
+			button: { text: mulinoMediaPicker.buttonText },
 			multiple: false
 		} );
 
 		frame.on( 'select', function () {
 			var attachment = frame.state().get( 'selection' ).first().toJSON();
-			$( '#mfs_file_id' ).val( attachment.id );
-			$( '#mfs_file_name' ).text( attachment.filename || attachment.title );
+			$( '#mulino_file_id' ).val( attachment.id );
+			$( '#mulino_file_name' ).text( attachment.filename || attachment.title );
 		} );
 
 		frame.open();

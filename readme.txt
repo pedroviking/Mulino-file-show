@@ -4,7 +4,7 @@ Tags: documents, files, folders, file manager, document library
 Requires at least: 5.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,7 +27,7 @@ with a single shortcode.
 
 **Frontend features**
 
-* `[mfs_documents]` shortcode shows a breadcrumb-navigable folder browser
+* `[mulino_documents]` shortcode shows a breadcrumb-navigable folder browser
 * File-type icons (PDF, Word, Excel, images, and more)
 * No page reloads needed to browse between folders
 
@@ -50,7 +50,7 @@ https://github.com/pedroviking/mulino-file-show
 2. Activate the plugin through the 'Plugins' screen in WordPress.
 3. Go to **Mulino file show** in the admin menu to create folders and upload
    documents.
-4. Add the `[mfs_documents]` shortcode to any page or post to
+4. Add the `[mulino_documents]` shortcode to any page or post to
    show the public folder browser.
 
 == Frequently Asked Questions ==
@@ -82,9 +82,12 @@ library. This may change in a future version.
 == Screenshots ==
 
 1. The Mulino file show admin screen, with the folder tree and drag-and-drop upload area.
-2. The public folder browser shown by the `[mfs_documents]` shortcode.
+2. The public folder browser shown by the `[mulino_documents]` shortcode.
 
 == Changelog ==
+
+= 1.0.2 =
+* All code identifiers now use the longer, more distinctive prefix `mulino` instead of `mfs` (functions, constants, hooks, AJAX actions, post type, taxonomy, shortcode, CSS classes and script handles). The shortcode is now `[mulino_documents]`, and add-ons must use the new hook names.
 
 = 1.0.1 =
 * Internal cleanup: a few leftover asset handles and one icon CSS class from an earlier plugin name had never been fully renamed. They are harmless in isolation but were replaced for consistency and to remove any theoretical collision risk with another plugin.
