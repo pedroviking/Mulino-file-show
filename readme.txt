@@ -37,7 +37,7 @@ Mulino file show stores everything using WordPress' own post types and
 taxonomies -- no custom database tables, so your data stays portable
 and inspectable with standard WordPress tools. It also exposes a small
 set of actions and filters for building your own extensions; see
-`HOOKS.md` in the plugin's source repository.
+https://github.com/pedroviking/mulino-file-show/blob/main/HOOKS.md
 
 This plugin is free and open source. Source code, issue tracker, and
 the automated test suite live at:
