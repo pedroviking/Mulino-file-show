@@ -29,7 +29,7 @@ with a single shortcode.
 
 * `[mulino_documents]` shortcode shows a breadcrumb-navigable folder browser
 * File-type icons (PDF, Word, Excel, images, and more)
-* No page reloads needed to browse between folders
+* Every folder has its own link, so you can bookmark it or share it directly
 
 **Under the hood**
 
