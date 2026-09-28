@@ -34,15 +34,16 @@ PHP versions.
 
 ## Installation
 
-Not yet published on the WordPress.org plugin directory. Until then:
+Mulino file show is available in the WordPress.org plugin directory:
+<https://wordpress.org/plugins/mulino-file-show/>
 
-1. Download this repository as a ZIP (Code → Download ZIP), or clone it.
-2. Upload the `mulino-file-show` folder to `wp-content/plugins/`.
-3. Activate **Mulino file show** under Plugins in your WordPress admin.
+1. In your WordPress admin, go to **Plugins → Add New** and search for
+   "Mulino file show".
+2. Click **Install Now**, then **Activate**.
 
 ## Usage
 
-- Manage folders and documents under **Mulino file show** in the admin menu.
+- Manage folders and documents under **File Show** in the admin menu.
 - Drop a file onto the drop zone to upload it into the currently open
   folder; drag a file card or a folder in the tree to re-file it.
 - Add the `[mulino_documents]` shortcode to any page or post to
