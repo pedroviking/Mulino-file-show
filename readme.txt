@@ -48,7 +48,7 @@ https://github.com/pedroviking/mulino-file-show
 1. Upload the `mulino-file-show` folder to `/wp-content/plugins/`, or install
    through the WordPress plugin screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress.
-3. Go to **Mulino file show** in the admin menu to create folders and upload
+3. Go to **File Show** in the admin menu to create folders and upload
    documents.
 4. Add the `[mulino_documents]` shortcode to any page or post to
    show the public folder browser.
