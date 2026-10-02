@@ -48,3 +48,29 @@ function mulino_file_icon_svg( $label, $color ) {
 		<text x="24" y="55" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="bold" fill="#ffffff">' . esc_html( $label ) . '</text>
 	</svg>';
 }
+
+/**
+ * Sort folders or documents the way people read numbers: "Minutes 2"
+ * before "Minutes 10", and "2009" before "2010". The database's own
+ * alphabetical ORDER BY can't do this, so it happens here in PHP.
+ *
+ * @param array    $items The terms or posts to sort.
+ * @param callable $key   Returns the text to sort one item by.
+ * @param string   $order "asc" or "desc".
+ * @return array The same items, sorted and re-indexed.
+ */
+function mulino_natural_sort( $items, $key, $order = 'asc' ) {
+	if ( ! is_array( $items ) ) {
+		return array();
+	}
+
+	$direction = 'desc' === $order ? -1 : 1;
+	usort(
+		$items,
+		function ( $a, $b ) use ( $key, $direction ) {
+			return $direction * strnatcasecmp( (string) $key( $a ), (string) $key( $b ) );
+		}
+	);
+
+	return $items;
+}

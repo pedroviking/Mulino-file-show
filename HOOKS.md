@@ -48,11 +48,26 @@ add_filter( 'mulino_manager_toolbar', function ( $html ) {
 } );
 ```
 
+## Filters (frontend)
+
+| Hook | What it changes | Signature |
+|---|---|---|
+| `mulino_frontend_document_query_args` | The `get_posts()` arguments used to list the documents in the folder a visitor is looking at in `[mulino_documents]` | `apply_filters( 'mulino_frontend_document_query_args', array $query_args, WP_Term\|false $current_term )` (`false` at the top of the whole library) |
+
+Example -- only list documents whose title contains "Approved":
+
+```php
+add_filter( 'mulino_frontend_document_query_args', function ( $query_args, $current_term ) {
+    $query_args['s'] = 'Approved';
+    return $query_args;
+}, 10, 2 );
+```
+
 ## What's intentionally *not* a hook (yet)
 
-The frontend `[mulino_documents]` shortcode doesn't expose equivalent
-filters yet. If a premium add-on needs to add something to the
-public-facing folder browser (not just the admin screen), that's a
-reasonable next hook to add -- open an issue on the repository rather
-than reading shortcode.php's internals directly, since those internals
-aren't a stable contract.
+Apart from the document query above, the frontend `[mulino_documents]`
+shortcode doesn't expose filters yet. If a premium add-on needs to add
+something to the public-facing folder browser (not just the admin
+screen), that's a reasonable next hook to add -- open an issue on the
+repository rather than reading shortcode.php's internals directly, since
+those internals aren't a stable contract.

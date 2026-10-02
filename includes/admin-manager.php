@@ -61,10 +61,20 @@ function mulino_enqueue_manager_assets( $hook ) {
 		'mulino-manager-assets',
 		'mulinoManager',
 		array(
-			'nonce'   => wp_create_nonce( 'mulino_manager_nonce' ),
-			'rootUrl' => remove_query_arg( 'folder' ),
-			'i18n'    => array(
+			'nonce'         => wp_create_nonce( 'mulino_manager_nonce' ),
+			'rootUrl'       => remove_query_arg( 'folder' ),
+			'maxUploadSize' => wp_max_upload_size(),
+			'i18n'          => array(
 				'uploadFailed'         => __( 'Upload failed.', 'mulino-file-show' ),
+				/* translators: 1: file name, 2: maximum upload size, e.g. "8 MB". */
+				'fileTooLarge'         => __( '%1$s is larger than the maximum upload size of %2$s.', 'mulino-file-show' ),
+				'maxUploadSizeText'    => size_format( wp_max_upload_size() ),
+				/* translators: 1: number of the file being uploaded, 2: total number of files. */
+				'uploadingProgress'    => __( 'Uploading file %1$d of %2$d...', 'mulino-file-show' ),
+				/* translators: 1: number of files uploaded, 2: number of files dropped. */
+				'uploadSummary'        => __( 'Uploaded: %1$d of %2$d.', 'mulino-file-show' ),
+				/* translators: %d: HTTP status code, e.g. 413. */
+				'serverRejected'       => __( 'The server rejected the upload (HTTP %d). The file may be larger than your web host allows.', 'mulino-file-show' ),
 				'renameDocPrompt'      => __( 'Rename document to:', 'mulino-file-show' ),
 				'couldNotRename'       => __( 'Could not rename.', 'mulino-file-show' ),
 				'deleteDocConfirm'     => __( 'Move this document to the trash?', 'mulino-file-show' ),
@@ -96,6 +106,13 @@ function mulino_render_folder_tree( $parent_id, $selected_id ) {
 	if ( is_wp_error( $terms ) || empty( $terms ) ) {
 		return '';
 	}
+
+	$terms = mulino_natural_sort(
+		$terms,
+		function ( $term ) {
+			return $term->name;
+		}
+	);
 
 	$base_url = remove_query_arg( 'folder' );
 	$out      = '<ul class="mulino-subtree">';
@@ -148,7 +165,12 @@ function mulino_render_manager_cards( $term ) {
 		);
 	}
 
-	$docs = get_posts( $args );
+	$docs = mulino_natural_sort(
+		get_posts( $args ),
+		function ( $doc ) {
+			return get_the_title( $doc );
+		}
+	);
 
 	if ( empty( $docs ) ) {
 		return '<p class="mulino-empty">' . esc_html__( 'No documents here yet. Drag files onto the drop zone above.', 'mulino-file-show' ) . '</p>';
@@ -234,6 +256,22 @@ function mulino_render_manager_page() {
 			<div class="mulino-files-pane">
 				<div id="mulino-dropzone" data-folder-id="<?php echo esc_attr( $selected_id ); ?>">
 					<p><?php esc_html_e( 'Drag files here to upload', 'mulino-file-show' ); ?></p>
+					<p class="mulino-dropzone-limit">
+						<?php
+						echo esc_html(
+							sprintf(
+								/* translators: %s: maximum upload size, e.g. "8 MB". */
+								__( 'Maximum size per file: %s', 'mulino-file-show' ),
+								size_format( wp_max_upload_size() )
+							)
+						);
+						?>
+					</p>
+				</div>
+				<div id="mulino-upload-status" class="mulino-upload-status" aria-live="polite" hidden>
+					<p class="mulino-upload-text"></p>
+					<progress class="mulino-upload-progress" max="1" value="0"></progress>
+					<ul class="mulino-upload-errors"></ul>
 				</div>
 				<div class="mulino-grid" id="mulino-file-grid">
 					<?php

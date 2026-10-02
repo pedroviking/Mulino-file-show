@@ -4,7 +4,7 @@ Tags: documents, files, folders, file manager, document library
 Requires at least: 5.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.2
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,10 +24,14 @@ with a single shortcode.
 * Drag existing documents or whole folders to re-file them
 * Rename or delete folders and documents from the same screen
 * Nested folders of unlimited depth
+* Uploads run one file at a time with a progress bar, and files that are too big for your web host are caught before they are sent
 
 **Frontend features**
 
 * `[mulino_documents]` shortcode shows a breadcrumb-navigable folder browser
+* Show the whole library, or start in one folder with `folder="..."`
+* Natural sorting ("Minutes 2" before "Minutes 10"), optionally newest year first
+* Optionally hide folders that have no documents yet
 * File-type icons (PDF, Word, Excel, images, and more)
 * Every folder has its own link, so you can bookmark it or share it directly
 
@@ -55,6 +59,20 @@ https://github.com/pedroviking/mulino-file-show
 
 == Frequently Asked Questions ==
 
+= Which options does the shortcode have? =
+
+All of them are optional:
+
+* `folder="minutes"` starts the browser in the folder with that slug instead of at the top of the library. Visitors can't browse above it, so you can put different folders on different pages.
+* `folder_order="desc"` lists folders in reverse order, e.g. the newest year first. Default: `asc`.
+* `orderby="date"` sorts documents by upload date instead of by name. Default: `name`.
+* `document_order="desc"` reverses the document order, e.g. "Budget 2010" before "Budget 2009". Default: `asc`. (`order` works too.)
+* `hide_empty="yes"` hides folders with no documents in them or in any of their subfolders. Default: `no`.
+
+Example: `[mulino_documents folder="minutes" folder_order="desc"]`
+
+To find a folder's slug, open the folder on the **File Show** admin screen and look at the address bar: it's the part after `folder=`, e.g. `board-minutes` for a folder called "Board Minutes".
+
 = Do I need to know how to code to use this? =
 
 No. Creating folders, uploading files, and organizing them is all done
@@ -73,6 +91,10 @@ date. The folder structure you see in Mulino file show is a separate
 organizational layer on top of that, not a real filesystem folder
 structure.
 
+= What happens to my documents if I delete the plugin? =
+
+By default nothing: your documents and folders stay in the database, so you can reinstall the plugin and carry on. If you want them removed too, tick "Also delete all documents and folders" under **Settings > Media** before deleting the plugin. The uploaded files in the Media Library are kept either way.
+
 = Does deleting a document also delete the uploaded file? =
 
 Not currently. Deleting a document removes it from Mulino file show (moving
@@ -85,6 +107,14 @@ library. This may change in a future version.
 2. The public folder browser shown by the `[mulino_documents]` shortcode.
 
 == Changelog ==
+
+= 1.1.0 =
+* New shortcode options: `folder`, `folder_order`, `orderby`, `document_order` and `hide_empty`. See the FAQ.
+* Folders and documents are now sorted naturally ("Minutes 2" before "Minutes 10"), both on the site and in the admin screen.
+* Documents that aren't in any folder are now shown at the top of the library on the site, just like under "All" in the admin screen.
+* Uploads now run one file at a time with a progress bar. Files larger than your web host's limit are caught before they're sent, and all problems are listed together instead of in one pop-up per file.
+* New setting under Settings > Media: delete all documents and folders when the plugin is deleted (off by default).
+* New filter for developers: `mulino_frontend_document_query_args`.
 
 = 1.0.2 =
 * All code identifiers now use the longer, more distinctive prefix `mulino` instead of `mfs` (functions, constants, hooks, AJAX actions, post type, taxonomy, shortcode, CSS classes and script handles). The shortcode is now `[mulino_documents]`, and add-ons must use the new hook names.

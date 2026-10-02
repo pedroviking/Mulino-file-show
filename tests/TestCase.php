@@ -19,6 +19,14 @@ class MULINO_TestCase extends \WP_Mock\Tools\TestCase {
 		// safe default -- it means individual tests don't each need to
 		// remember to stub it themselves.
 		WP_Mock::userFunction( 'is_wp_error' )->andReturn( false );
+
+		// The render functions merge their optional $args with defaults;
+		// a plain array merge is all wp_parse_args() does for arrays.
+		WP_Mock::userFunction( 'wp_parse_args' )->andReturnUsing(
+			function ( $args, $defaults = array() ) {
+				return array_merge( $defaults, (array) $args );
+			}
+		);
 	}
 
 	/**

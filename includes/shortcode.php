@@ -17,9 +17,40 @@ if ( ! defined( 'ABSPATH' ) ) {
  * No filesystem paths are ever read from user input, only a term
  * slug that is looked up against the mulino_folder taxonomy -- so
  * there's no path-traversal surface here.
+ *
+ * Attributes (all optional):
+ *  - folder="slug"         start in this folder instead of the whole library;
+ *                          visitors can't browse above it
+ *  - orderby="name|date"   how documents are sorted (default: name)
+ *  - document_order="asc|desc" document sort direction (default: asc);
+ *                          plain order="..." is accepted too
+ *  - folder_order="asc|desc" folder sort direction (default: asc), e.g.
+ *                          "desc" to show the newest year first
+ *  - hide_empty="yes|no"   hide folders with no documents in them or in
+ *                          any of their subfolders (default: no)
  */
-function mulino_shortcode() {
+function mulino_shortcode( $atts = array() ) {
 	$taxonomy = 'mulino_folder';
+	$args     = mulino_parse_shortcode_atts( $atts );
+
+	$root_term = false;
+	if ( '' !== $args['folder'] ) {
+		$root_term = get_term_by( 'slug', $args['folder'], $taxonomy );
+		if ( ! $root_term || is_wp_error( $root_term ) ) {
+			// Only editors see why the browser is missing; visitors just
+			// see nothing rather than a half-broken library.
+			if ( current_user_can( 'edit_posts' ) ) {
+				return '<p class="mulino-empty">' . esc_html(
+					sprintf(
+						/* translators: %s: the folder slug given in the shortcode's folder="" attribute. */
+						__( 'Mulino file show: the folder "%s" was not found.', 'mulino-file-show' ),
+						$args['folder']
+					)
+				) . '</p>';
+			}
+			return '';
+		}
+	}
 
 	// Sanitize + validate the requested folder slug. This is read-only
 	// display filtering (which folder to show), not a state-changing
@@ -28,17 +59,20 @@ function mulino_shortcode() {
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$requested_slug = isset( $_GET['mulino_folder'] ) ? sanitize_title( wp_unslash( $_GET['mulino_folder'] ) ) : '';
 	$current_term   = $requested_slug ? get_term_by( 'slug', $requested_slug, $taxonomy ) : false;
+	if ( ! $current_term || is_wp_error( $current_term ) || ! mulino_term_is_within( $current_term, $root_term, $taxonomy ) ) {
+		$current_term = $root_term;
+	}
 
 	ob_start();
 	?>
 	<div class="mulino-browser">
 		<?php
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- each value is escaped individually inside this function before being concatenated into the returned HTML string.
-		echo mulino_render_breadcrumb( $current_term, $taxonomy );
+		echo mulino_render_breadcrumb( $current_term, $taxonomy, $root_term );
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- each value is escaped individually inside this function before being concatenated into the returned HTML string.
-		echo mulino_render_subfolders( $current_term, $taxonomy );
+		echo mulino_render_subfolders( $current_term, $taxonomy, $args );
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- each value is escaped individually inside this function before being concatenated into the returned HTML string.
-		echo mulino_render_documents( $current_term, $taxonomy );
+		echo mulino_render_documents( $current_term, $taxonomy, $args );
 		?>
 	</div>
 	<?php
@@ -46,13 +80,68 @@ function mulino_shortcode() {
 }
 add_shortcode( 'mulino_documents', 'mulino_shortcode' );
 
-function mulino_render_breadcrumb( $current_term, $taxonomy ) {
+/**
+ * Merge the shortcode attributes with their defaults and force every
+ * value into its allowed set, so the render functions never have to
+ * second-guess what they're given.
+ */
+function mulino_parse_shortcode_atts( $atts ) {
+	$atts = shortcode_atts(
+		array(
+			'folder'       => '',
+			'orderby'      => 'name',
+			'document_order' => '',
+			'order'          => 'asc',
+			'folder_order'   => 'asc',
+			'hide_empty'     => 'no',
+		),
+		$atts,
+		'mulino_documents'
+	);
+
+	$orderby      = strtolower( trim( (string) $atts['orderby'] ) );
+	// document_order mirrors folder_order; order is the shorter alias.
+	$order        = strtolower( trim( (string) ( '' !== $atts['document_order'] ? $atts['document_order'] : $atts['order'] ) ) );
+	$folder_order = strtolower( trim( (string) $atts['folder_order'] ) );
+	$hide_empty   = strtolower( trim( (string) $atts['hide_empty'] ) );
+
+	return array(
+		'folder'       => sanitize_title( (string) $atts['folder'] ),
+		'orderby'      => in_array( $orderby, array( 'name', 'date' ), true ) ? $orderby : 'name',
+		'order'        => 'desc' === $order ? 'desc' : 'asc',
+		'folder_order' => 'desc' === $folder_order ? 'desc' : 'asc',
+		'hide_empty'   => in_array( $hide_empty, array( 'yes', 'true', '1' ), true ),
+	);
+}
+
+/**
+ * Is $term the root folder itself, or somewhere below it? With no
+ * root folder (the whole library), every folder qualifies.
+ */
+function mulino_term_is_within( $term, $root_term, $taxonomy ) {
+	if ( ! $root_term ) {
+		return true;
+	}
+	if ( (int) $term->term_id === (int) $root_term->term_id ) {
+		return true;
+	}
+	return in_array( (int) $root_term->term_id, array_map( 'intval', get_ancestors( $term->term_id, $taxonomy, 'taxonomy' ) ), true );
+}
+
+function mulino_render_breadcrumb( $current_term, $taxonomy, $root_term = false ) {
 	$base_url = remove_query_arg( 'mulino_folder' );
 	$crumbs   = array( '<a href="' . esc_url( $base_url ) . '">' . esc_html__( 'Home', 'mulino-file-show' ) . '</a>' );
 
-	if ( $current_term && ! is_wp_error( $current_term ) ) {
+	$at_root = ! $current_term || ( $root_term && (int) $current_term->term_id === (int) $root_term->term_id );
+
+	if ( ! $at_root && ! is_wp_error( $current_term ) ) {
 		$ancestors = array_reverse( get_ancestors( $current_term->term_id, $taxonomy, 'taxonomy' ) );
+		$visible   = ! $root_term; // with a root folder, start listing below it
 		foreach ( $ancestors as $ancestor_id ) {
+			if ( ! $visible ) {
+				$visible = ( (int) $ancestor_id === (int) $root_term->term_id );
+				continue;
+			}
 			$ancestor = get_term( $ancestor_id, $taxonomy );
 			if ( $ancestor && ! is_wp_error( $ancestor ) ) {
 				$url      = add_query_arg( 'mulino_folder', $ancestor->slug, $base_url );
@@ -65,20 +154,40 @@ function mulino_render_breadcrumb( $current_term, $taxonomy ) {
 	return '<nav class="mulino-breadcrumb">' . implode( ' &raquo; ', $crumbs ) . '</nav>';
 }
 
-function mulino_render_subfolders( $current_term, $taxonomy ) {
+function mulino_render_subfolders( $current_term, $taxonomy, $args = array() ) {
+	$args      = wp_parse_args(
+		$args,
+		array(
+			'folder_order' => 'asc',
+			'hide_empty'   => false,
+		)
+	);
 	$parent_id = $current_term ? $current_term->term_id : 0;
 
 	$subfolders = get_terms(
 		array(
-			'taxonomy'   => $taxonomy,
-			'parent'     => $parent_id,
-			'hide_empty' => false,
+			'taxonomy'     => $taxonomy,
+			'parent'       => $parent_id,
+			// With hide_empty, WordPress still keeps a folder whose own
+			// count is 0 if one of its subfolders has documents (e.g. a
+			// decade folder that only holds year folders), because
+			// hierarchical defaults to true.
+			'hide_empty'   => (bool) $args['hide_empty'],
+			'hierarchical' => true,
 		)
 	);
 
 	if ( is_wp_error( $subfolders ) || empty( $subfolders ) ) {
 		return '';
 	}
+
+	$subfolders = mulino_natural_sort(
+		$subfolders,
+		function ( $folder ) {
+			return $folder->name;
+		},
+		$args['folder_order']
+	);
 
 	$base_url = remove_query_arg( 'mulino_folder' );
 	$out      = '<div class="mulino-grid">';
@@ -101,34 +210,71 @@ function mulino_folder_icon_svg() {
 	</svg>';
 }
 
-function mulino_render_documents( $current_term, $taxonomy ) {
-	// At the root (no folder selected) we don't list documents that
-	// might be attached directly to top-level terms only -- adjust
-	// this if you want root-level "loose" documents too.
-	if ( ! $current_term ) {
-		return '';
-	}
-
-	$documents = get_posts(
+function mulino_render_documents( $current_term, $taxonomy, $args = array() ) {
+	$args = wp_parse_args(
+		$args,
 		array(
-			'post_type'      => 'mulino_document',
-			'posts_per_page' => -1,
-			'orderby'        => 'title',
-			'order'          => 'ASC',
-			// A tax_query is inherently scoped to one specific folder
-			// term here (not an open-ended query), so this stays fast
-			// even on a large document library.
-			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
-			'tax_query'      => array(
-				array(
-					'taxonomy'         => $taxonomy,
-					'field'            => 'term_id',
-					'terms'            => $current_term->term_id,
-					'include_children' => false,
-				),
-			),
+			'orderby'    => 'name',
+			'order'      => 'asc',
+			'hide_empty' => false,
 		)
 	);
+
+	if ( $current_term ) {
+		// A tax_query is inherently scoped to one specific folder
+		// term here (not an open-ended query), so this stays fast
+		// even on a large document library.
+		$tax_query = array(
+			array(
+				'taxonomy'         => $taxonomy,
+				'field'            => 'term_id',
+				'terms'            => $current_term->term_id,
+				'include_children' => false,
+			),
+		);
+	} else {
+		// Top of the whole library: documents that aren't in any
+		// folder, the same ones the admin screen shows under "All".
+		$tax_query = array(
+			array(
+				'taxonomy' => $taxonomy,
+				'operator' => 'NOT EXISTS',
+			),
+		);
+	}
+
+	$query_args = array(
+		'post_type'      => 'mulino_document',
+		'posts_per_page' => -1,
+		'orderby'        => 'date' === $args['orderby'] ? 'date' : 'title',
+		'order'          => strtoupper( $args['order'] ),
+		// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+		'tax_query'      => $tax_query,
+	);
+
+	/**
+	 * Filters the get_posts() arguments used to list the documents in
+	 * one folder of the frontend [mulino_documents] browser.
+	 *
+	 * @param array         $query_args   Arguments passed to get_posts().
+	 * @param WP_Term|false $current_term The folder being shown, or false
+	 *                                    at the top of the whole library.
+	 */
+	$query_args = apply_filters( 'mulino_frontend_document_query_args', $query_args, $current_term );
+
+	$documents = get_posts( $query_args );
+
+	if ( 'name' === $args['orderby'] ) {
+		// The database sorts "Minutes 10" before "Minutes 2"; people
+		// expect the other way round.
+		$documents = mulino_natural_sort(
+			$documents,
+			function ( $doc ) {
+				return get_the_title( $doc );
+			},
+			$args['order']
+		);
+	}
 
 	if ( empty( $documents ) ) {
 		// Only show the "empty" message if this folder is completely
@@ -137,8 +283,8 @@ function mulino_render_documents( $current_term, $taxonomy ) {
 		$subfolder_count = wp_count_terms(
 			array(
 				'taxonomy'   => $taxonomy,
-				'parent'     => $current_term->term_id,
-				'hide_empty' => false,
+				'parent'     => $current_term ? $current_term->term_id : 0,
+				'hide_empty' => (bool) $args['hide_empty'],
 			)
 		);
 		if ( ! is_wp_error( $subfolder_count ) && $subfolder_count > 0 ) {

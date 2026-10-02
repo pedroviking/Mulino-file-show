@@ -48,6 +48,10 @@ Mulino file show is available in the WordPress.org plugin directory:
   folder; drag a file card or a folder in the tree to re-file it.
 - Add the `[mulino_documents]` shortcode to any page or post to
   show the public, browsable folder view.
+- Optional shortcode attributes: `folder="slug"` (start in one folder),
+  `folder_order="desc"` (e.g. newest year first), `orderby="name|date"`,
+  `document_order="asc|desc"` and `hide_empty="yes"`. Example:
+  `[mulino_documents folder="minutes" folder_order="desc"]`
 
 ## Extending
 
